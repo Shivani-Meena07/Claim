@@ -1,7 +1,11 @@
-
 import { useEffect, useMemo, useState } from 'react'
-import { createCycle, getCycles } from '../api'
-import { ChevronLeft, ChevronRight, Sparkles, Droplet } from 'lucide-react'
+import {
+  createCycle,
+  getCycles,
+  getPrediction,
+  getCycleAIInsight,
+} from '../api'
+import { ChevronLeft, ChevronRight, Droplet, Sparkles } from 'lucide-react'
 import { Card, CardContent } from '../components/ui/Card'
 import { Button } from '../components/ui/Button'
 
@@ -81,6 +85,16 @@ interface Cycle {
   pain: number
 }
 
+interface Prediction {
+  averageCycleLength: number
+  nextPeriod: string
+  ovulationDate: string
+  fertileWindow: {
+    start: string
+    end: string
+  }
+}
+
 export default function CycleTracker() {
   const [monthOffset, setMonthOffset] = useState(0)
 
@@ -90,16 +104,60 @@ export default function CycleTracker() {
   const [flow, setFlow] =
     useState<'None' | 'Light' | 'Medium' | 'Heavy'>('None')
 
-  const [pain, setPain] = useState(2)
+  const [pain, setPain] = useState(0)
 
   const [saving, setSaving] = useState(false)
 
   const [cycles, setCycles] = useState<Cycle[]>([])
 
-  const [loadingCycles, setLoadingCycles] =
-    useState(true)
+  const [prediction, setPrediction] =
+    useState<Prediction | null>(null)
 
-  // Fetch saved cycles when the page loads
+  const [aiInsight, setAiInsight] = useState('')
+
+  const [loadingAI, setLoadingAI] = useState(false)
+
+  // Load prediction
+  async function loadPrediction() {
+    try {
+      const data = await getPrediction()
+
+      console.log('Prediction:', data)
+
+      if (data.prediction) {
+        setPrediction(data.prediction)
+      }
+    } catch (error) {
+      console.error(
+        'Error loading prediction:',
+        error
+      )
+    }
+  }
+
+  // Load AI insight
+  async function loadAIInsight() {
+    try {
+      setLoadingAI(true)
+
+      const data = await getCycleAIInsight()
+
+      console.log('AI insight:', data)
+
+      setAiInsight(data.insight || '')
+    } catch (error) {
+      console.error(
+        'Error loading AI insight:',
+        error
+      )
+
+      setAiInsight('')
+    } finally {
+      setLoadingAI(false)
+    }
+  }
+
+  // Fetch saved cycles when page loads
   useEffect(() => {
     async function loadCycles() {
       try {
@@ -107,11 +165,19 @@ export default function CycleTracker() {
 
         console.log('Saved cycles:', data)
 
-        setCycles(data.cycles || [])
+        const savedCycles = data.cycles || []
+
+        setCycles(savedCycles)
+
+        if (savedCycles.length > 0) {
+          await loadPrediction()
+          await loadAIInsight()
+        }
       } catch (error) {
-        console.error('Error loading cycles:', error)
-      } finally {
-        setLoadingCycles(false)
+        console.error(
+          'Error loading cycles:',
+          error
+        )
       }
     }
 
@@ -128,7 +194,9 @@ export default function CycleTracker() {
     : DEFAULT_CYCLE_START
 
   const cycleLength =
-    latestCycle?.cycleLength || DEFAULT_CYCLE_LENGTH
+    prediction?.averageCycleLength ||
+    latestCycle?.cycleLength ||
+    DEFAULT_CYCLE_LENGTH
 
   // Save today's cycle log
   async function handleSaveLog() {
@@ -147,17 +215,28 @@ export default function CycleTracker() {
 
       console.log('Cycle saved:', data)
 
-      // Immediately add the new cycle to the frontend state
       if (data.cycle) {
         setCycles((prev) => [
           data.cycle,
           ...prev,
         ])
+
+        // Reset form
+        setSelectedSymptoms([])
+        setFlow('None')
+        setPain(0)
+
+        // Refresh prediction and AI insight
+        await loadPrediction()
+        await loadAIInsight()
       }
 
       alert('Cycle log saved successfully!')
     } catch (error) {
-      console.error('Error saving cycle:', error)
+      console.error(
+        'Error saving cycle:',
+        error
+      )
 
       alert('Failed to save cycle log.')
     } finally {
@@ -195,7 +274,11 @@ export default function CycleTracker() {
     const cells: (Date | null)[] =
       Array(startWeekday).fill(null)
 
-    for (let d = 1; d <= daysInMonth; d++) {
+    for (
+      let d = 1;
+      d <= daysInMonth;
+      d++
+    ) {
       cells.push(
         new Date(
           viewMonth.getFullYear(),
@@ -216,6 +299,17 @@ export default function CycleTracker() {
     )
   }
 
+  function formatDate(dateString: string) {
+    return new Date(dateString).toLocaleDateString(
+      'en-US',
+      {
+        day: 'numeric',
+        month: 'short',
+        year: 'numeric',
+      }
+    )
+  }
+
   return (
     <div className="space-y-5">
 
@@ -226,197 +320,239 @@ export default function CycleTracker() {
         </h2>
 
         <p className="text-sm text-muted-foreground">
-          Log today and see your predicted phases.
+          Log your cycle information and view your saved data.
         </p>
       </div>
 
-      <div className="grid lg:grid-cols-3 gap-5">
+      {/* Calendar */}
+      <Card>
+        <CardContent>
 
-        {/* Calendar */}
-        <Card className="lg:col-span-2">
-          <CardContent>
+          <div className="flex items-center justify-between mb-5">
 
-            <div className="flex items-center justify-between mb-5">
+            <h3 className="font-display text-lg">
+              {monthLabel}
+            </h3>
 
-              <h3 className="font-display text-lg">
-                {monthLabel}
-              </h3>
+            <div className="flex gap-1">
 
-              <div className="flex gap-1">
-
-                <button
-                  className="p-1.5 rounded-lg hover:bg-muted focus-ring"
-                  onClick={() =>
-                    setMonthOffset((m) => m - 1)
-                  }
-                  aria-label="Previous month"
-                >
-                  <ChevronLeft size={18} />
-                </button>
-
-                <button
-                  className="p-1.5 rounded-lg hover:bg-muted focus-ring"
-                  onClick={() =>
-                    setMonthOffset((m) => m + 1)
-                  }
-                  aria-label="Next month"
-                >
-                  <ChevronRight size={18} />
-                </button>
-
-              </div>
-            </div>
-
-            {/* Week days */}
-            <div className="grid grid-cols-7 gap-1.5 text-center text-xs text-muted-foreground mb-2">
-
-              {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map(
-                (d, i) => (
-                  <span key={i}>
-                    {d}
-                  </span>
-                )
-              )}
-
-            </div>
-
-            {/* Calendar days */}
-            <div className="grid grid-cols-7 gap-1.5">
-
-              {days.map((date, i) => {
-
-                if (!date) {
-                  return <div key={i} />
+              <button
+                type="button"
+                className="p-1.5 rounded-lg hover:bg-muted focus-ring"
+                onClick={() =>
+                  setMonthOffset((m) => m - 1)
                 }
+                aria-label="Previous month"
+              >
+                <ChevronLeft size={18} />
+              </button>
 
-                const type = dayType(
-                  date,
-                  cycleStart,
-                  cycleLength
-                )
-
-                const isToday =
-                  date.toDateString() ===
-                  new Date(
-                    2026,
-                    7,
-                    7
-                  ).toDateString()
-
-                return (
-                  <button
-                    key={i}
-                    className={`aspect-square rounded-xl text-sm flex items-center justify-center transition-colors focus-ring ${
-                      DAY_STYLES[type] ||
-                      'hover:bg-muted'
-                    } ${
-                      isToday
-                        ? 'ring-2 ring-primary ring-offset-2 ring-offset-card'
-                        : ''
-                    }`}
-                  >
-                    {date.getDate()}
-                  </button>
-                )
-              })}
+              <button
+                type="button"
+                className="p-1.5 rounded-lg hover:bg-muted focus-ring"
+                onClick={() =>
+                  setMonthOffset((m) => m + 1)
+                }
+                aria-label="Next month"
+              >
+                <ChevronRight size={18} />
+              </button>
 
             </div>
+          </div>
 
-            {/* Legend */}
-            <div className="flex flex-wrap gap-4 mt-5 text-xs text-muted-foreground">
+          {/* Week days */}
+          <div className="grid grid-cols-7 gap-1.5 text-center text-xs text-muted-foreground mb-2">
 
-              <span className="flex items-center gap-1.5">
-                <span className="h-2.5 w-2.5 rounded-full bg-bloom" />
-                Period
+            {[
+              'S',
+              'M',
+              'T',
+              'W',
+              'T',
+              'F',
+              'S',
+            ].map((d, i) => (
+              <span key={i}>
+                {d}
               </span>
+            ))}
 
-              <span className="flex items-center gap-1.5">
-                <span className="h-2.5 w-2.5 rounded-full bg-sun-soft" />
-                Fertile window
-              </span>
+          </div>
 
-              <span className="flex items-center gap-1.5">
-                <span className="h-2.5 w-2.5 rounded-full bg-sun" />
-                Ovulation
-              </span>
+          {/* Calendar days */}
+          <div className="grid grid-cols-7 gap-1.5">
+
+            {days.map((date, i) => {
+
+              if (!date) {
+                return <div key={i} />
+              }
+
+              const type = dayType(
+                date,
+                cycleStart,
+                cycleLength
+              )
+
+              const isToday =
+                date.toDateString() ===
+                new Date().toDateString()
+
+              return (
+                <button
+                  key={i}
+                  type="button"
+                  className={`aspect-square rounded-xl text-sm flex items-center justify-center transition-colors focus-ring ${
+                    DAY_STYLES[type] ||
+                    'hover:bg-muted'
+                  } ${
+                    isToday
+                      ? 'ring-2 ring-primary ring-offset-2 ring-offset-card'
+                      : ''
+                  }`}
+                >
+                  {date.getDate()}
+                </button>
+              )
+            })}
+
+          </div>
+
+          {/* Legend */}
+          <div className="flex flex-wrap gap-4 mt-5 text-xs text-muted-foreground">
+
+            <span className="flex items-center gap-1.5">
+              <span className="h-2.5 w-2.5 rounded-full bg-bloom" />
+              Period
+            </span>
+
+            <span className="flex items-center gap-1.5">
+              <span className="h-2.5 w-2.5 rounded-full bg-sun-soft" />
+              Fertile window
+            </span>
+
+            <span className="flex items-center gap-1.5">
+              <span className="h-2.5 w-2.5 rounded-full bg-sun" />
+              Ovulation
+            </span>
+
+          </div>
+
+        </CardContent>
+      </Card>
+
+      {/* Cycle Overview */}
+      <Card>
+        <CardContent>
+
+          <div className="flex items-center gap-2 mb-5">
+            <Sparkles size={18} />
+            <h3 className="font-display text-lg">
+              Cycle overview
+            </h3>
+          </div>
+
+          {prediction ? (
+            <div className="grid md:grid-cols-4 gap-5">
+
+              {/* Next period */}
+              <div>
+                <p className="text-sm text-muted-foreground mb-1">
+                  Estimated next period
+                </p>
+
+                <p className="font-medium">
+                  {formatDate(
+                    prediction.nextPeriod
+                  )}
+                </p>
+              </div>
+
+              {/* Cycle length */}
+              <div>
+                <p className="text-sm text-muted-foreground mb-1">
+                  Cycle length
+                </p>
+
+                <p className="font-medium">
+                  {prediction.averageCycleLength} days
+                </p>
+              </div>
+
+              {/* Ovulation */}
+              <div>
+                <p className="text-sm text-muted-foreground mb-1">
+                  Estimated ovulation
+                </p>
+
+                <p className="font-medium">
+                  {formatDate(
+                    prediction.ovulationDate
+                  )}
+                </p>
+              </div>
+
+              {/* Fertile window */}
+              <div>
+                <p className="text-sm text-muted-foreground mb-1">
+                  Estimated fertile window
+                </p>
+
+                <p className="font-medium">
+                  {formatDate(
+                    prediction.fertileWindow.start
+                  )}{' '}
+                  –{' '}
+                  {formatDate(
+                    prediction.fertileWindow.end
+                  )}
+                </p>
+              </div>
 
             </div>
+          ) : (
+            <p className="text-sm text-muted-foreground">
+              Save a cycle to see your cycle estimates.
+            </p>
+          )}
 
-          </CardContent>
-        </Card>
+          <p className="text-xs text-muted-foreground mt-5">
+            These are calendar estimates based on your saved cycle length.
+            They are not AI predictions.
+          </p>
 
-        {/* AI prediction card */}
-        <Card className="bg-linear-to-br from-dusk to-bloom text-white">
-
-          <CardContent>
+          {/* AI Insight */}
+          <div className="mt-6 border-t border-border pt-5">
 
             <div className="flex items-center gap-2 mb-3">
-
               <Sparkles size={16} />
-
-              <span className="text-sm font-medium">
-                AI prediction
-              </span>
-
+              <p className="text-sm font-medium">
+                AI insight
+              </p>
             </div>
 
-            <p className="font-display text-2xl mb-1">
-              Next period in 12 days
-            </p>
+            {loadingAI ? (
+              <p className="text-sm text-muted-foreground">
+                Generating your personalized insight...
+              </p>
+            ) : aiInsight ? (
+              <p className="text-sm leading-relaxed text-muted-foreground">
+                {aiInsight}
+              </p>
+            ) : (
+              <p className="text-sm text-muted-foreground">
+                Save a cycle to receive a personalized AI insight.
+              </p>
+            )}
 
-            <p className="text-white/75 text-sm mb-5">
-              Expected 19–21 August, based on your last 6 cycles
-            </p>
+          </div>
 
-            <div className="space-y-2.5 text-sm">
+        </CardContent>
+      </Card>
 
-              <div className="flex justify-between border-t border-white/15 pt-2.5">
-
-                <span className="text-white/70">
-                  Cycle length
-                </span>
-
-                <span>
-                  {cycleLength} days (avg)
-                </span>
-
-              </div>
-
-              <div className="flex justify-between border-t border-white/15 pt-2.5">
-
-                <span className="text-white/70">
-                  Fertile window
-                </span>
-
-                <span>
-                  Today – 3 days
-                </span>
-
-              </div>
-
-              <div className="flex justify-between border-t border-white/15 pt-2.5">
-
-                <span className="text-white/70">
-                  Prediction confidence
-                </span>
-
-                <span>
-                  High
-                </span>
-
-              </div>
-
-            </div>
-
-          </CardContent>
-
-        </Card>
-
-      </div>
-
-      {/* Logging */}
+      {/* Log today */}
       <Card>
-
         <CardContent>
 
           <h3 className="font-display text-lg mb-5">
@@ -438,7 +574,10 @@ export default function CycleTracker() {
 
                   <button
                     key={f}
-                    onClick={() => setFlow(f)}
+                    type="button"
+                    onClick={() =>
+                      setFlow(f)
+                    }
                     className={`px-3.5 py-2 rounded-xl text-sm border transition-colors focus-ring ${
                       flow === f
                         ? 'bg-bloom text-white border-bloom'
@@ -474,6 +613,7 @@ export default function CycleTracker() {
 
                   <button
                     key={s}
+                    type="button"
                     onClick={() =>
                       toggleSymptom(s)
                     }
@@ -533,8 +673,88 @@ export default function CycleTracker() {
           </Button>
 
         </CardContent>
-
       </Card>
+
+      {/* Last saved log */}
+      {latestCycle && (
+        <Card>
+          <CardContent>
+
+            <h3 className="font-display text-lg mb-4">
+              Last saved log
+            </h3>
+
+            <div className="grid md:grid-cols-4 gap-5 text-sm">
+
+              {/* Date */}
+              <div>
+                <p className="text-muted-foreground mb-1">
+                  Date
+                </p>
+
+                <p className="font-medium">
+                  {formatDate(
+                    latestCycle.startDate
+                  )}
+                </p>
+              </div>
+
+              {/* Flow */}
+              <div>
+                <p className="text-muted-foreground mb-1">
+                  Flow
+                </p>
+
+                <p className="font-medium">
+                  {latestCycle.flow}
+                </p>
+              </div>
+
+              {/* Symptoms */}
+              <div>
+                <p className="text-muted-foreground mb-1">
+                  Symptoms
+                </p>
+
+                {latestCycle.symptoms &&
+                latestCycle.symptoms.length > 0 ? (
+                  <div className="flex flex-wrap gap-2">
+
+                    {latestCycle.symptoms.map(
+                      (symptom) => (
+                        <span
+                          key={symptom}
+                          className="px-2.5 py-1 rounded-full bg-dusk-soft text-dusk text-xs"
+                        >
+                          {symptom}
+                        </span>
+                      )
+                    )}
+
+                  </div>
+                ) : (
+                  <p className="font-medium">
+                    None
+                  </p>
+                )}
+              </div>
+
+              {/* Pain */}
+              <div>
+                <p className="text-muted-foreground mb-1">
+                  Pain level
+                </p>
+
+                <p className="font-medium">
+                  {latestCycle.pain}/5
+                </p>
+              </div>
+
+            </div>
+
+          </CardContent>
+        </Card>
+      )}
 
     </div>
   )

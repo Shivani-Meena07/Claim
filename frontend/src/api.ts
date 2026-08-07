@@ -34,6 +34,11 @@ export const getCycles = async () => {
   return response.data
 }
 
+export const getCurrentUser = async () => {
+  const response = await api.get('/auth/me')
+  return response.data
+}
+
 export const updateCycle = async (id: string, cycleData: CycleData) => {
   const response = await api.put(`/cycles/${id}`, cycleData)
   return response.data
@@ -41,6 +46,16 @@ export const updateCycle = async (id: string, cycleData: CycleData) => {
 
 export const deleteCycle = async (id: string) => {
   const response = await api.delete(`/cycles/${id}`)
+  return response.data
+}
+
+export const getPrediction = async () => {
+  const response = await api.get('/cycles/prediction')
+  return response.data
+}
+
+export const getCycleAIInsight = async () => {
+  const response = await api.get('/cycles/ai-insight')
   return response.data
 }
 
