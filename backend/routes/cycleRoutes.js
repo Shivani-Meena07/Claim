@@ -6,6 +6,7 @@ const {
   updateCycle,
   deleteCycle,
   getCycleAIInsight,
+  getPrediction,
 } = require("../controllers/cycleController");
 
 const authMiddleware = require("../middleware/authMiddleware");
@@ -15,6 +16,7 @@ const router = express.Router();
 router.post("/", authMiddleware, createCycle);
 router.get("/", authMiddleware, getCycles);
 
+router.get("/prediction", authMiddleware, getPrediction);
 router.get("/ai-insight", authMiddleware, getCycleAIInsight);
 
 router.put("/:id", authMiddleware, updateCycle);

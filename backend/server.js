@@ -8,6 +8,7 @@ const cycleRoutes = require("./routes/cycleRoutes");
 const chatbotRoutes = require("./routes/chatbotRoutes");
 const doctorRoutes = require("./routes/doctorRoutes");
 const reportRoutes = require("./routes/reportRoutes");
+const bookingRoutes = require("./routes/bookingRoutes");
 
 const app = express();
 
@@ -19,6 +20,7 @@ app.use("/api/cycles", cycleRoutes);
 app.use("/api/chatbot", chatbotRoutes);
 app.use("/api/doctors", doctorRoutes);
 app.use("/api/reports", reportRoutes);
+app.use("/api/bookings", bookingRoutes);
 
 connectDB();
 

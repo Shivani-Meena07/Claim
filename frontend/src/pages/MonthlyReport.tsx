@@ -219,48 +219,40 @@ export default function MonthlyReport() {
   const [aiLoading, setAiLoading] = useState(true)
   const [aiError, setAiError] = useState('')
 
-  useEffect(() => {
-    const generateReport = async () => {
-      try {
-        setAiLoading(true)
-        setAiError('')
+ useEffect(() => {
+  const generateReport = async () => {
+    try {
+      setAiLoading(true)
+      setAiError('')
 
-        const token = localStorage.getItem('token')
+      const token = localStorage.getItem('token')
 
-        const response = await fetch('/api/reports/monthly-ai', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({
-            cycleLengths: CYCLE_LENGTHS,
-            symptomFrequency: SYMPTOM_FREQ,
-            flowSplit: FLOW_SPLIT,
-            moodTrend: MOOD_TREND,
-            sleepTrend: SLEEP_TREND,
-          }),
-        })
+      const response = await fetch('/api/reports/monthly-ai', {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
 
-        const data = await response.json()
+      const data = await response.json()
 
-        if (!response.ok) {
-          throw new Error(
-            data.message || 'Failed to generate AI report'
-          )
-        }
-
-        setAiSummary(data.summary || '')
-      } catch (error) {
-        console.error('Monthly report AI error:', error)
-        setAiError('Unable to generate AI summary.')
-      } finally {
-        setAiLoading(false)
+      if (!response.ok) {
+        throw new Error(
+          data.message || 'Failed to generate AI report'
+        )
       }
-    }
 
-    generateReport()
-  }, [])
+      setAiSummary(data.summary)
+    } catch (error) {
+      console.error('Monthly report AI error:', error)
+      setAiError('Unable to generate AI summary.')
+    } finally {
+      setAiLoading(false)
+    }
+  }
+
+  generateReport()
+}, []) 
 
   return (
     <div className="space-y-6">
