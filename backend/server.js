@@ -5,6 +5,7 @@ require("dotenv").config();
 const connectDB = require("./config/db");
 const authRoutes = require("./routes/authRoutes");
 const cycleRoutes = require("./routes/cycleRoutes");
+const chatbotRoutes = require("./routes/chatbotRoutes");
 
 const app = express();
 
@@ -13,6 +14,7 @@ app.use(express.json());
 
 app.use("/api/auth", authRoutes);
 app.use("/api/cycles", cycleRoutes);
+app.use("/api/chatbot", chatbotRoutes);
 
 connectDB();
 

@@ -1,11 +1,18 @@
+
 import { useEffect, useMemo, useState } from 'react'
+import ReactMarkdown from 'react-markdown'
 import {
   createCycle,
   getCycles,
   getPrediction,
   getCycleAIInsight,
 } from '../api'
-import { ChevronLeft, ChevronRight, Droplet, Sparkles } from 'lucide-react'
+import {
+  ChevronLeft,
+  ChevronRight,
+  Droplet,
+  Sparkles,
+} from 'lucide-react'
 import { Card, CardContent } from '../components/ui/Card'
 import { Button } from '../components/ui/Button'
 
@@ -311,34 +318,40 @@ export default function CycleTracker() {
   }
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-6 pb-8">
 
       {/* Header */}
-      <div>
-        <h2 className="font-display text-2xl">
+      <div className="space-y-1">
+        <h2 className="font-display text-2xl font-semibold tracking-tight">
           Cycle tracker
         </h2>
 
         <p className="text-sm text-muted-foreground">
-          Log your cycle information and view your saved data.
+          Track your cycle, symptoms, and daily wellness patterns.
         </p>
       </div>
 
       {/* Calendar */}
       <Card>
-        <CardContent>
+        <CardContent className="p-5 md:p-6">
 
-          <div className="flex items-center justify-between mb-5">
+          <div className="flex items-center justify-between mb-6">
 
-            <h3 className="font-display text-lg">
-              {monthLabel}
-            </h3>
+            <div>
+              <h3 className="font-display text-lg font-semibold">
+                {monthLabel}
+              </h3>
 
-            <div className="flex gap-1">
+              <p className="text-xs text-muted-foreground mt-0.5">
+                Your estimated cycle phases
+              </p>
+            </div>
+
+            <div className="flex items-center gap-1">
 
               <button
                 type="button"
-                className="p-1.5 rounded-lg hover:bg-muted focus-ring"
+                className="p-2 rounded-lg hover:bg-muted transition-colors focus-ring"
                 onClick={() =>
                   setMonthOffset((m) => m - 1)
                 }
@@ -349,7 +362,7 @@ export default function CycleTracker() {
 
               <button
                 type="button"
-                className="p-1.5 rounded-lg hover:bg-muted focus-ring"
+                className="p-2 rounded-lg hover:bg-muted transition-colors focus-ring"
                 onClick={() =>
                   setMonthOffset((m) => m + 1)
                 }
@@ -362,7 +375,7 @@ export default function CycleTracker() {
           </div>
 
           {/* Week days */}
-          <div className="grid grid-cols-7 gap-1.5 text-center text-xs text-muted-foreground mb-2">
+          <div className="grid grid-cols-7 gap-2 text-center text-[11px] font-medium uppercase tracking-wide text-muted-foreground mb-3">
 
             {[
               'S',
@@ -381,7 +394,7 @@ export default function CycleTracker() {
           </div>
 
           {/* Calendar days */}
-          <div className="grid grid-cols-7 gap-1.5">
+          <div className="grid grid-cols-7 gap-2">
 
             {days.map((date, i) => {
 
@@ -403,7 +416,7 @@ export default function CycleTracker() {
                 <button
                   key={i}
                   type="button"
-                  className={`aspect-square rounded-xl text-sm flex items-center justify-center transition-colors focus-ring ${
+                  className={`aspect-square rounded-xl text-sm font-medium flex items-center justify-center transition-all focus-ring ${
                     DAY_STYLES[type] ||
                     'hover:bg-muted'
                   } ${
@@ -420,19 +433,19 @@ export default function CycleTracker() {
           </div>
 
           {/* Legend */}
-          <div className="flex flex-wrap gap-4 mt-5 text-xs text-muted-foreground">
+          <div className="flex flex-wrap gap-x-5 gap-y-2 mt-6 pt-5 border-t border-border text-xs text-muted-foreground">
 
-            <span className="flex items-center gap-1.5">
+            <span className="flex items-center gap-2">
               <span className="h-2.5 w-2.5 rounded-full bg-bloom" />
               Period
             </span>
 
-            <span className="flex items-center gap-1.5">
+            <span className="flex items-center gap-2">
               <span className="h-2.5 w-2.5 rounded-full bg-sun-soft" />
               Fertile window
             </span>
 
-            <span className="flex items-center gap-1.5">
+            <span className="flex items-center gap-2">
               <span className="h-2.5 w-2.5 rounded-full bg-sun" />
               Ovulation
             </span>
@@ -444,127 +457,260 @@ export default function CycleTracker() {
 
       {/* Cycle Overview */}
       <Card>
-        <CardContent>
+        <CardContent className="p-5 md:p-6">
 
-          <div className="flex items-center gap-2 mb-5">
-            <Sparkles size={18} />
-            <h3 className="font-display text-lg">
-              Cycle overview
-            </h3>
+          <div className="flex items-center gap-2 mb-6">
+
+            <div className="h-8 w-8 rounded-lg bg-bloom/10 flex items-center justify-center">
+              <Sparkles
+                size={16}
+                className="text-bloom"
+              />
+            </div>
+
+            <div>
+              <h3 className="font-display text-lg font-semibold">
+                Cycle overview
+              </h3>
+
+              <p className="text-xs text-muted-foreground">
+                Your current cycle estimates
+              </p>
+            </div>
+
           </div>
 
           {prediction ? (
-            <div className="grid md:grid-cols-4 gap-5">
+
+            <div className="grid sm:grid-cols-2 md:grid-cols-4 gap-3">
 
               {/* Next period */}
-              <div>
-                <p className="text-sm text-muted-foreground mb-1">
+              <div className="rounded-xl bg-muted/40 p-4">
+
+                <p className="text-xs text-muted-foreground mb-2">
                   Estimated next period
                 </p>
 
-                <p className="font-medium">
+                <p className="text-sm font-semibold">
                   {formatDate(
                     prediction.nextPeriod
                   )}
                 </p>
+
               </div>
 
               {/* Cycle length */}
-              <div>
-                <p className="text-sm text-muted-foreground mb-1">
+              <div className="rounded-xl bg-muted/40 p-4">
+
+                <p className="text-xs text-muted-foreground mb-2">
                   Cycle length
                 </p>
 
-                <p className="font-medium">
+                <p className="text-sm font-semibold">
                   {prediction.averageCycleLength} days
                 </p>
+
               </div>
 
               {/* Ovulation */}
-              <div>
-                <p className="text-sm text-muted-foreground mb-1">
+              <div className="rounded-xl bg-muted/40 p-4">
+
+                <p className="text-xs text-muted-foreground mb-2">
                   Estimated ovulation
                 </p>
 
-                <p className="font-medium">
+                <p className="text-sm font-semibold">
                   {formatDate(
                     prediction.ovulationDate
                   )}
                 </p>
+
               </div>
 
               {/* Fertile window */}
-              <div>
-                <p className="text-sm text-muted-foreground mb-1">
+              <div className="rounded-xl bg-muted/40 p-4">
+
+                <p className="text-xs text-muted-foreground mb-2">
                   Estimated fertile window
                 </p>
 
-                <p className="font-medium">
+                <p className="text-sm font-semibold">
                   {formatDate(
                     prediction.fertileWindow.start
-                  )}{' '}
-                  –{' '}
+                  )}
+                  {' – '}
                   {formatDate(
                     prediction.fertileWindow.end
                   )}
                 </p>
+
               </div>
 
             </div>
+
           ) : (
-            <p className="text-sm text-muted-foreground">
-              Save a cycle to see your cycle estimates.
-            </p>
+
+            <div className="rounded-xl bg-muted/40 p-4">
+
+              <p className="text-sm text-muted-foreground">
+                Save a cycle to see your cycle estimates.
+              </p>
+
+            </div>
+
           )}
 
-          <p className="text-xs text-muted-foreground mt-5">
+          <p className="text-xs leading-relaxed text-muted-foreground mt-5">
             These are calendar estimates based on your saved cycle length.
             They are not AI predictions.
           </p>
 
           {/* AI Insight */}
-          <div className="mt-6 border-t border-border pt-5">
+          <div className="mt-6 pt-6 border-t border-border">
 
             <div className="flex items-center gap-2 mb-3">
-              <Sparkles size={16} />
-              <p className="text-sm font-medium">
-                AI insight
-              </p>
+
+              <div className="h-7 w-7 rounded-lg bg-bloom/10 flex items-center justify-center">
+                <Sparkles
+                  size={14}
+                  className="text-bloom"
+                />
+              </div>
+
+              <div>
+                <p className="text-sm font-semibold">
+                  AI insight
+                </p>
+
+                <p className="text-[11px] text-muted-foreground">
+                  Based on your recent cycle data
+                </p>
+              </div>
+
             </div>
 
-            {loadingAI ? (
-              <p className="text-sm text-muted-foreground">
-                Generating your personalized insight...
-              </p>
-            ) : aiInsight ? (
-              <p className="text-sm leading-relaxed text-muted-foreground">
-                {aiInsight}
-              </p>
-            ) : (
-              <p className="text-sm text-muted-foreground">
-                Save a cycle to receive a personalized AI insight.
-              </p>
-            )}
+            <div className="rounded-xl bg-bloom/5 border border-bloom/10 p-4 md:p-5">
+
+              {loadingAI ? (
+
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+
+                  <Sparkles
+                    size={15}
+                    className="text-bloom animate-pulse"
+                  />
+
+                  <span>
+                    Generating your personalized insight...
+                  </span>
+
+                </div>
+
+              ) : aiInsight ? (
+
+                <div className="text-sm leading-6 text-foreground/80">
+
+                  <ReactMarkdown
+                    components={{
+
+                      p: ({ children }) => (
+                        <p className="mb-3 last:mb-0">
+                          {children}
+                        </p>
+                      ),
+
+                      strong: ({ children }) => (
+                        <strong className="font-semibold text-foreground">
+                          {children}
+                        </strong>
+                      ),
+
+                      ul: ({ children }) => (
+                        <ul className="list-disc pl-5 mb-3 space-y-1.5">
+                          {children}
+                        </ul>
+                      ),
+
+                      ol: ({ children }) => (
+                        <ol className="list-decimal pl-5 mb-3 space-y-1.5">
+                          {children}
+                        </ol>
+                      ),
+
+                      li: ({ children }) => (
+                        <li className="pl-1">
+                          {children}
+                        </li>
+                      ),
+
+                      h1: ({ children }) => (
+                        <h1 className="text-base font-semibold text-foreground mb-2">
+                          {children}
+                        </h1>
+                      ),
+
+                      h2: ({ children }) => (
+                        <h2 className="text-base font-semibold text-foreground mb-2">
+                          {children}
+                        </h2>
+                      ),
+
+                      h3: ({ children }) => (
+                        <h3 className="text-sm font-semibold text-foreground mb-2">
+                          {children}
+                        </h3>
+                      ),
+
+                      blockquote: ({ children }) => (
+                        <blockquote className="border-l-2 border-bloom/40 pl-3 my-3 italic text-muted-foreground">
+                          {children}
+                        </blockquote>
+                      ),
+
+                    }}
+                  >
+                    {aiInsight}
+                  </ReactMarkdown>
+
+                </div>
+
+              ) : (
+
+                <p className="text-sm leading-relaxed text-muted-foreground">
+                  Save a cycle to receive a personalized AI insight.
+                </p>
+
+              )}
+
+            </div>
 
           </div>
 
         </CardContent>
       </Card>
 
-      {/* Log today */}
+      {/* Log Today */}
       <Card>
-        <CardContent>
+        <CardContent className="p-5 md:p-6">
 
-          <h3 className="font-display text-lg mb-5">
-            Log today
-          </h3>
+          <div className="mb-6">
+
+            <h3 className="font-display text-lg font-semibold">
+              Log today
+            </h3>
+
+            <p className="text-xs text-muted-foreground mt-1">
+              Record how you're feeling today.
+            </p>
+
+          </div>
 
           <div className="grid md:grid-cols-3 gap-8">
 
             {/* Flow */}
             <div>
 
-              <p className="text-sm font-medium mb-3">
+              <p className="text-sm font-semibold mb-3">
                 Flow
               </p>
 
@@ -603,7 +749,7 @@ export default function CycleTracker() {
             {/* Symptoms */}
             <div>
 
-              <p className="text-sm font-medium mb-3">
+              <p className="text-sm font-semibold mb-3">
                 Symptoms
               </p>
 
@@ -635,9 +781,25 @@ export default function CycleTracker() {
             {/* Pain */}
             <div>
 
-              <p className="text-sm font-medium mb-3">
-                Pain level: {pain}/5
+              <p className="text-sm font-semibold mb-3">
+                Pain level
               </p>
+
+              <div className="flex items-center justify-between mb-3">
+
+                <span className="text-xs text-muted-foreground">
+                  None
+                </span>
+
+                <span className="text-sm font-semibold">
+                  {pain}/5
+                </span>
+
+                <span className="text-xs text-muted-foreground">
+                  Severe
+                </span>
+
+              </div>
 
               <input
                 type="range"
@@ -652,73 +814,86 @@ export default function CycleTracker() {
                 className="w-full accent-bloom"
               />
 
-              <div className="flex justify-between text-xs text-muted-foreground mt-1">
-                <span>None</span>
-                <span>Severe</span>
-              </div>
-
             </div>
 
           </div>
 
           {/* Save button */}
-          <Button
-            className="mt-6"
-            onClick={handleSaveLog}
-            disabled={saving}
-          >
-            {saving
-              ? 'Saving...'
-              : "Save today's log"}
-          </Button>
+          <div className="mt-7 pt-5 border-t border-border">
+
+            <Button
+              onClick={handleSaveLog}
+              disabled={saving}
+            >
+              {saving
+                ? 'Saving...'
+                : "Save today's log"}
+            </Button>
+
+          </div>
 
         </CardContent>
       </Card>
 
-      {/* Last saved log */}
+      {/* Last Saved Log */}
       {latestCycle && (
+
         <Card>
-          <CardContent>
+          <CardContent className="p-5 md:p-6">
 
-            <h3 className="font-display text-lg mb-4">
-              Last saved log
-            </h3>
+            <div className="mb-6">
 
-            <div className="grid md:grid-cols-4 gap-5 text-sm">
+              <h3 className="font-display text-lg font-semibold">
+                Last saved log
+              </h3>
+
+              <p className="text-xs text-muted-foreground mt-1">
+                Your most recently recorded cycle information.
+              </p>
+
+            </div>
+
+            <div className="grid sm:grid-cols-2 md:grid-cols-4 gap-4">
 
               {/* Date */}
-              <div>
-                <p className="text-muted-foreground mb-1">
+              <div className="rounded-xl bg-muted/40 p-4">
+
+                <p className="text-xs text-muted-foreground mb-2">
                   Date
                 </p>
 
-                <p className="font-medium">
+                <p className="text-sm font-semibold">
                   {formatDate(
                     latestCycle.startDate
                   )}
                 </p>
+
               </div>
 
               {/* Flow */}
-              <div>
-                <p className="text-muted-foreground mb-1">
+              <div className="rounded-xl bg-muted/40 p-4">
+
+                <p className="text-xs text-muted-foreground mb-2">
                   Flow
                 </p>
 
-                <p className="font-medium">
+                <p className="text-sm font-semibold">
                   {latestCycle.flow}
                 </p>
+
               </div>
 
               {/* Symptoms */}
-              <div>
-                <p className="text-muted-foreground mb-1">
+              <div className="rounded-xl bg-muted/40 p-4">
+
+                <p className="text-xs text-muted-foreground mb-2">
                   Symptoms
                 </p>
 
                 {latestCycle.symptoms &&
                 latestCycle.symptoms.length > 0 ? (
-                  <div className="flex flex-wrap gap-2">
+
+                  <div className="flex flex-wrap gap-1.5">
 
                     {latestCycle.symptoms.map(
                       (symptom) => (
@@ -732,28 +907,35 @@ export default function CycleTracker() {
                     )}
 
                   </div>
+
                 ) : (
-                  <p className="font-medium">
+
+                  <p className="text-sm font-semibold">
                     None
                   </p>
+
                 )}
+
               </div>
 
               {/* Pain */}
-              <div>
-                <p className="text-muted-foreground mb-1">
+              <div className="rounded-xl bg-muted/40 p-4">
+
+                <p className="text-xs text-muted-foreground mb-2">
                   Pain level
                 </p>
 
-                <p className="font-medium">
+                <p className="text-sm font-semibold">
                   {latestCycle.pain}/5
                 </p>
+
               </div>
 
             </div>
 
           </CardContent>
         </Card>
+
       )}
 
     </div>
