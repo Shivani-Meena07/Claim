@@ -4,12 +4,17 @@ const ai = new GoogleGenAI({
   apiKey: process.env.GEMINI_API_KEY,
 });
 
+// ===============================
+// CYCLE INSIGHT AI
+// ===============================
+
 const generateCycleInsight = async (cycleData, prediction) => {
   try {
     const prompt = `
 You are a supportive menstrual cycle wellness assistant.
 
-Use the user's cycle information and the calculated prediction below to provide a short, clear, personalized wellness insight.
+Use the user's cycle information and the calculated prediction below to provide
+a short, clear, personalized wellness insight.
 
 User cycle information:
 
@@ -52,12 +57,14 @@ Do not diagnose any medical condition.
   }
 };
 
-
 // ===============================
 // CHATBOT AI RESPONSE
 // ===============================
 
-const generateChatbotResponse = async (message, conversationHistory = []) => {
+const generateChatbotResponse = async (
+  message,
+  conversationHistory = []
+) => {
   try {
     const historyText =
       conversationHistory.length > 0
@@ -73,6 +80,7 @@ const generateChatbotResponse = async (message, conversationHistory = []) => {
 You are a supportive menstrual health and wellness assistant.
 
 Your purpose is to provide general educational information about:
+
 - menstrual cycles
 - periods
 - PMS
@@ -89,7 +97,8 @@ You must follow these rules:
 - Do not diagnose medical conditions.
 - Do not claim certainty about a user's health.
 - Do not prescribe medications or provide prescription dosages.
-- If the user describes severe, unusual, worsening, or concerning symptoms, recommend speaking with a qualified healthcare professional.
+- If the user describes severe, unusual, worsening, or concerning symptoms,
+  recommend speaking with a qualified healthcare professional.
 - Clearly distinguish general information from medical advice.
 - Keep responses concise and conversational.
 - Do not mention that you are using Gemini.
@@ -116,8 +125,90 @@ Respond naturally to the user's current message.
   }
 };
 
+// ===============================
+// MONTHLY REPORT AI SUMMARY
+// ===============================
+
+const generateMonthlyReport = async (reportData) => {
+  try {
+    const prompt = `
+You are a supportive menstrual health and wellness assistant.
+
+Analyze the following monthly menstrual wellness report and create a short,
+clear, personalized summary.
+
+Monthly report data:
+
+Cycle lengths:
+${JSON.stringify(reportData.cycleLengths)}
+
+Symptom frequency:
+${JSON.stringify(reportData.symptomFrequency)}
+
+Flow intensity:
+${JSON.stringify(reportData.flowSplit)}
+
+Mood trend:
+${JSON.stringify(reportData.moodTrend)}
+
+Sleep trend:
+${JSON.stringify(reportData.sleepTrend)}
+
+Format your response using Markdown exactly like this:
+
+## Overview
+
+Write 2-3 clear sentences summarizing the user's month.
+
+## Key Patterns
+
+Write 2-3 clear sentences about the most noticeable cycle, symptom,
+mood, flow, or sleep patterns.
+
+## Wellness Suggestions
+
+- **Suggestion 1:** Give one practical and gentle suggestion.
+- **Suggestion 2:** Give another practical and gentle suggestion.
+
+## Important Note
+
+Write one short sentence explaining that these observations are estimates
+based on the user's logged data and are not medical advice.
+
+Rules:
+
+- Use Markdown headings exactly as shown.
+- Use bullet points only in the Wellness Suggestions section.
+- Bold the important part of each wellness suggestion.
+- Do not use numbered sections.
+- Do not add any heading before "## Overview".
+- Do not add any heading after "## Important Note".
+- Keep the total response under 150 words.
+- Do not diagnose any medical condition.
+- Do not prescribe medication.
+- Do not claim certainty about the user's health.
+- If something appears concerning, recommend discussing it with a qualified
+  healthcare professional.
+`;
+
+    const response = await ai.models.generateContent({
+      model: "gemini-3.6-flash",
+      contents: prompt,
+    });
+
+    return response.text;
+  } catch (error) {
+    console.error("Gemini monthly report error:", error);
+    throw error;
+  }
+};
+
+// ===============================
+// EXPORTS
+// ===============================
 
 module.exports = {
   generateCycleInsight,
   generateChatbotResponse,
+  generateMonthlyReport,
 };
