@@ -111,10 +111,17 @@ const getMonthlyReportAI = async (req, res) => {
   } catch (error) {
     console.error("Monthly report AI error:", error);
 
-    res.status(500).json({
-      success: false,
-      message: "Failed to generate monthly report",
-    });
+    if (error.status === 429) {
+  return res.status(429).json({
+    success: false,
+    message: "AI service quota exceeded. Please try again later.",
+  });
+}
+
+res.status(500).json({
+  success: false,
+  message: "Failed to generate monthly report",
+});
   }
 };
 
