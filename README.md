@@ -1,31 +1,594 @@
-# Claim — Menstrual Wellness Companion
+# 🌸 CLAIM — Menstrual Wellness Companion
 
-Claim is an AI-powered menstrual wellness web application designed to help users track their menstrual cycles, understand patterns, receive personalized wellness insights, and connect with healthcare professionals.
+<p align="center">
+  <strong>Track. Understand. Improve. Connect.</strong>
+</p>
 
-## 🚀 Tech Stack
+<p align="center">
+  <em>An AI-powered menstrual wellness platform built around health education, personal awareness, responsible AI, and access to professional support.</em>
+</p>
 
-### Frontend
+<p align="center">
 
-* React
-* TypeScript
-* Vite
-* Tailwind CSS
-* Recharts
-* Lucide React
-* React Router
+![React](https://img.shields.io/badge/React-2026-blue?logo=react)
+![Node.js](https://img.shields.io/badge/Node.js-Backend-green?logo=node.js)
+![MongoDB](https://img.shields.io/badge/MongoDB-Database-green?logo=mongodb)
+![Gemini](https://img.shields.io/badge/Google%20Gemini-AI-blue)
+![JWT](https://img.shields.io/badge/Auth-JWT-orange)
+![License](https://img.shields.io/badge/Status-Active%20Development-blue)
 
-### Backend
-
-* Node.js
-* Express.js
-* MongoDB
-* Mongoose
-* JWT Authentication
-* Google Gemini API
+</p>
 
 ---
 
-# 📁 Project Structure
+## 🌍 A Public-Health Approach to Menstrual Wellness
+
+Menstrual health is not simply about predicting the next period.
+
+It is connected to **physical wellbeing, mental wellbeing, health education, dignity, access to information, and access to appropriate healthcare.**
+
+**Claim** is designed around these principles.
+
+The platform combines personal cycle tracking with AI-powered education, pattern visualization, wellness insights, and healthcare discovery — helping users move from:
+
+> **Awareness → Understanding → Action → Professional Support**
+
+> **Claim is inspired by a people-centred, evidence-informed public-health approach and is not affiliated with or endorsed by the World Health Organization (WHO).**
+
+---
+
+# 🩺 CLAIM AT A GLANCE
+
+<table>
+<tr>
+<td width="25%" align="center">
+
+### 🩸
+
+### TRACK
+
+Record cycle dates, flow, symptoms, pain, mood and other wellness information.
+
+</td>
+
+<td width="25%" align="center">
+
+### 🧠
+
+### UNDERSTAND
+
+Use AI-assisted insights to understand recurring patterns in your personal records.
+
+</td>
+
+<td width="25%" align="center">
+
+### 📊
+
+### VISUALIZE
+
+Transform personal health logs into understandable charts and monthly reports.
+
+</td>
+
+<td width="25%" align="center">
+
+### 👩‍⚕️
+
+### CONNECT
+
+Discover healthcare professionals when personal wellness information is not enough.
+
+</td>
+</tr>
+</table>
+
+---
+
+# 🌍 WHO-INSPIRED HEALTH PRINCIPLES
+
+Claim's product philosophy is organized around six public-health principles:
+
+<table>
+<tr>
+
+<td width="33%" align="center">
+
+### 🧑‍🤝‍🧑
+
+## EQUITY
+
+Make menstrual wellness information easier to understand and access.
+
+</td>
+
+<td width="33%" align="center">
+
+### 🧠
+
+## HEALTH EDUCATION
+
+Provide understandable, general educational information about menstrual wellness.
+
+</td>
+
+<td width="33%" align="center">
+
+### 🛡️
+
+## SAFETY
+
+Keep AI within responsible boundaries and avoid presenting wellness guidance as diagnosis.
+
+</td>
+
+</tr>
+
+<tr>
+
+<td width="33%" align="center">
+
+### 💙
+
+## DIGNITY
+
+Create a supportive, non-judgmental environment for menstrual health tracking.
+
+</td>
+
+<td width="33%" align="center">
+
+### 👩‍⚕️
+
+## HEALTHCARE ACCESS
+
+Create a pathway from self-awareness to professional support.
+
+</td>
+
+<td width="33%" align="center">
+
+### 🔐
+
+## PRIVACY
+
+Protect personal health information and keep sensitive credentials away from the client.
+
+</td>
+
+</tr>
+</table>
+
+---
+
+# 💡 THE PROBLEM
+
+Many menstrual tracking applications answer one primary question:
+
+> **"When is my next period?"**
+
+But menstrual wellness involves much more.
+
+Users may want to understand:
+
+<table>
+<tr>
+<td>
+
+### 🩸 Cycle
+
+How is my cycle changing?
+
+</td>
+<td>
+
+### 😣 Symptoms
+
+Which symptoms occur repeatedly?
+
+</td>
+<td>
+
+### 😊 Mood
+
+Are there recurring mood patterns?
+
+</td>
+</tr>
+
+<tr>
+<td>
+
+### 😴 Sleep
+
+How does my sleep relate to my logged cycle information?
+
+</td>
+<td>
+
+### 🍎 Wellness
+
+What general lifestyle practices may support wellbeing?
+
+</td>
+<td>
+
+### 👩‍⚕️ Care
+
+When should I consider professional support?
+
+</td>
+</tr>
+</table>
+
+### Claim's Answer
+
+> **Don't just predict the next period. Understand the bigger picture.**
+
+---
+
+# 🚀 WHAT CLAIM DOES
+
+```text
+                         ┌─────────────────────┐
+                         │     USER INPUT      │
+                         │                     │
+                         │ Cycle • Symptoms    │
+                         │ Pain • Flow • Mood  │
+                         │ Sleep • Wellness    │
+                         └──────────┬──────────┘
+                                    │
+                                    ▼
+                         ┌─────────────────────┐
+                         │    DATA STORAGE     │
+                         │       MongoDB       │
+                         └──────────┬──────────┘
+                                    │
+                                    ▼
+                         ┌─────────────────────┐
+                         │  PATTERN ANALYSIS   │
+                         │                     │
+                         │ Trends • Frequency  │
+                         │ Cycle patterns      │
+                         └──────────┬──────────┘
+                                    │
+                                    ▼
+                         ┌─────────────────────┐
+                         │      AI LAYER       │
+                         │    Gemini API       │
+                         └──────────┬──────────┘
+                                    │
+                    ┌───────────────┼───────────────┐
+                    ▼               ▼               ▼
+              ┌──────────┐   ┌──────────┐   ┌───────────┐
+              │ Insights │   │ Reports  │   │ AI Chat   │
+              └──────────┘   └──────────┘   └───────────┘
+                    │               │               │
+                    └───────────────┼───────────────┘
+                                    ▼
+                         ┌─────────────────────┐
+                         │   WELLNESS ACTION   │
+                         └──────────┬──────────┘
+                                    │
+                                    ▼
+                         ┌─────────────────────┐
+                         │   DOCTOR CONNECT    │
+                         └─────────────────────┘
+```
+
+---
+
+# ✨ CORE FEATURE CARDS
+
+<table>
+<tr>
+
+<td width="50%">
+
+## 🩸 SMART CYCLE TRACKER
+
+A personal menstrual health journal.
+
+**Track:**
+
+* Cycle start & end dates
+* Cycle length
+* Flow intensity
+* Symptoms
+* Pain levels
+* Historical cycles
+* Predictions
+
+**Actions:**
+
+* Create
+* View
+* Update
+* Delete
+
+</td>
+
+<td width="50%">
+
+## 🤖 AI WELLNESS COMPANION
+
+A conversational educational assistant powered by Google Gemini.
+
+**Topics include:**
+
+* Menstrual cycles
+* PMS
+* Common symptoms
+* Nutrition
+* Hydration
+* Exercise
+* Rest
+* General reproductive wellness
+
+</td>
+
+</tr>
+
+<tr>
+
+<td width="50%">
+
+## 📊 PERSONALIZED REPORTS
+
+Transform personal records into understandable visual insights.
+
+**Includes:**
+
+* Cycle trends
+* Flow patterns
+* Symptom frequency
+* Mood trends
+* Sleep trends
+* AI-generated wellness summaries
+
+</td>
+
+<td width="50%">
+
+## 👩‍⚕️ DOCTOR CONNECT
+
+Move beyond self-tracking when professional support is appropriate.
+
+**Discover:**
+
+* Specialty
+* Experience
+* Ratings
+* Location
+* Consultation availability
+
+**API:**
+
+```http
+GET /api/doctors
+```
+
+</td>
+
+</tr>
+</table>
+
+---
+
+# 🧠 RESPONSIBLE AI
+
+Health-related AI needs clear boundaries.
+
+Claim therefore follows a **wellness-first AI model**.
+
+<table>
+<tr>
+<td width="50%">
+
+### ✅ CLAIM CAN
+
+* Explain general menstrual health concepts
+* Provide educational information
+* Summarize logged wellness patterns
+* Generate general lifestyle suggestions
+* Help users understand their personal records
+* Encourage professional consultation when appropriate
+
+</td>
+
+<td width="50%">
+
+### ❌ CLAIM DOES NOT
+
+* Diagnose diseases
+* Replace healthcare professionals
+* Prescribe medication
+* Provide emergency medical care
+* Guarantee medical outcomes
+* Present AI output as a medical diagnosis
+
+</td>
+</tr>
+</table>
+
+> **AI should support health awareness — not replace healthcare professionals.**
+
+---
+
+# 📊 FROM DATA TO INSIGHT
+
+Claim converts personal records into a simple information pipeline:
+
+<table>
+<tr>
+<td align="center">
+
+### 01
+
+## 📝 LOG
+
+User records menstrual and wellness information.
+
+</td>
+
+<td align="center">
+
+### 02
+
+## 🔎 ANALYZE
+
+The platform organizes and analyzes the recorded information.
+
+</td>
+
+<td align="center">
+
+### 03
+
+## 📈 VISUALIZE
+
+Patterns are presented through understandable charts.
+
+</td>
+
+</tr>
+
+<tr>
+
+<td align="center">
+
+### 04
+
+## 🤖 INTERPRET
+
+AI generates a general wellness summary.
+
+</td>
+
+<td align="center">
+
+### 05
+
+## 💡 ACT
+
+Users receive practical wellness-oriented guidance.
+
+</td>
+
+<td align="center">
+
+### 06
+
+## 👩‍⚕️ CONNECT
+
+Professional support can become the next step.
+
+</td>
+
+</tr>
+</table>
+
+---
+
+# 🏗️ SYSTEM ARCHITECTURE
+
+```text
+┌─────────────────────────────────────────────────────────────┐
+│                         CLAIM APP                           │
+└─────────────────────────────────────────────────────────────┘
+
+                         👤 USER
+                           │
+                           ▼
+┌─────────────────────────────────────────────────────────────┐
+│                    REACT FRONTEND                           │
+│                                                             │
+│  Dashboard │ Cycle Tracker │ Reports │ AI Chat │ Doctors   │
+│                                                             │
+│  React • TypeScript • Vite • Tailwind • Recharts           │
+└────────────────────────────┬────────────────────────────────┘
+                             │
+                          REST API
+                             │
+                             ▼
+┌─────────────────────────────────────────────────────────────┐
+│                    NODE + EXPRESS                           │
+│                                                             │
+│ Controllers │ Routes │ Middleware │ Services                │
+└───────────────┬───────────────────┬─────────────────────────┘
+                │                   │
+                ▼                   ▼
+       ┌────────────────┐   ┌──────────────────┐
+       │    MongoDB     │   │   Gemini API     │
+       │                │   │                  │
+       │ User Data      │   │ AI Insights      │
+       │ Cycle Records  │   │ AI Wellness      │
+       │ Reports        │   │ Summaries        │
+       └────────────────┘   └──────────────────┘
+
+                             │
+                             ▼
+                    ┌─────────────────┐
+                    │   JWT SECURITY  │
+                    └─────────────────┘
+```
+
+---
+
+# 🛠️ TECHNOLOGY STACK
+
+<table>
+<tr>
+<td align="center" width="25%">
+
+### ⚛️ FRONTEND
+
+React
+TypeScript
+Vite
+Tailwind CSS
+React Router
+
+</td>
+
+<td align="center" width="25%">
+
+### 📊 VISUALIZATION
+
+Recharts
+Lucide React
+Responsive UI
+Reusable Components
+
+</td>
+
+<td align="center" width="25%">
+
+### ⚙️ BACKEND
+
+Node.js
+Express.js
+Mongoose
+REST APIs
+
+</td>
+
+<td align="center" width="25%">
+
+### 🤖 AI & DATA
+
+MongoDB
+Google Gemini
+JWT Authentication
+AI Insights
+
+</td>
+</tr>
+</table>
+
+---
+
+# 📁 PROJECT STRUCTURE
 
 ```text
 Claim/
@@ -65,16 +628,103 @@ Claim/
 
 ---
 
-# ⚙️ Setup
+# 🔌 API ENDPOINTS
 
-## 1. Clone the repository
+## 🔐 Authentication
+
+| Method | Endpoint           | Purpose           |
+| ------ | ------------------ | ----------------- |
+| POST   | `/api/auth/signup` | Register user     |
+| POST   | `/api/auth/login`  | Authenticate user |
+
+---
+
+## 🩸 Cycle Tracking
+
+| Method | Endpoint                 | Purpose             |
+| ------ | ------------------------ | ------------------- |
+| POST   | `/api/cycles`            | Create cycle        |
+| GET    | `/api/cycles`            | Get user's cycles   |
+| GET    | `/api/cycles/ai-insight` | Generate AI insight |
+| PUT    | `/api/cycles/:id`        | Update cycle        |
+| DELETE | `/api/cycles/:id`        | Delete cycle        |
+
+> 🔐 Cycle endpoints require JWT authentication.
+
+---
+
+## 👩‍⚕️ Healthcare
+
+| Method | Endpoint       | Purpose          |
+| ------ | -------------- | ---------------- |
+| GET    | `/api/doctors` | Retrieve doctors |
+
+---
+
+## 📊 Reports
+
+| Method | Endpoint                  | Purpose                    |
+| ------ | ------------------------- | -------------------------- |
+| POST   | `/api/reports/monthly-ai` | Generate monthly AI report |
+
+---
+
+# 🔐 PRIVACY & SECURITY
+
+Menstrual health information is sensitive.
+
+Claim follows a privacy-first development philosophy.
+
+<table>
+<tr>
+
+<td width="33%" align="center">
+
+## 🔐 AUTHENTICATION
+
+JWT-based authentication protects authenticated resources.
+
+</td>
+
+<td width="33%" align="center">
+
+## 🗄️ DATA ISOLATION
+
+User-specific records are retrieved using the authenticated user's identity.
+
+</td>
+
+<td width="33%" align="center">
+
+## 🔑 SECRET PROTECTION
+
+Database credentials and AI API keys remain server-side.
+
+</td>
+
+</tr>
+</table>
+
+### Never commit
+
+```text
+.env
+.env.local
+node_modules/
+```
+
+---
+
+# ⚙️ QUICK START
+
+### 1. Clone
 
 ```bash
 git clone <repository-url>
 cd Claim
 ```
 
-## 2. Frontend setup
+### 2. Frontend
 
 ```bash
 cd frontend
@@ -82,13 +732,11 @@ npm install
 npm run dev
 ```
 
-The frontend will normally run on:
-
 ```text
 http://localhost:5173
 ```
 
-## 3. Backend setup
+### 3. Backend
 
 Open another terminal:
 
@@ -98,17 +746,19 @@ npm install
 npm run dev
 ```
 
-The backend runs on:
-
 ```text
 http://localhost:5000
 ```
 
 ---
 
-# 🔐 Environment Variables
+# 🔑 ENVIRONMENT VARIABLES
 
-Create a `.env` file inside `backend/`.
+Create:
+
+```text
+backend/.env
+```
 
 ```env
 MONGODB_URI=your_mongodb_connection_string
@@ -116,225 +766,249 @@ JWT_SECRET=your_jwt_secret
 GEMINI_API_KEY=your_gemini_api_key
 ```
 
-Do not commit `.env` to GitHub.
+---
+
+# 🚧 ROADMAP
+
+<table>
+<tr>
+<td width="25%" align="center">
+
+## 🟢 PHASE 1
+
+### FOUNDATION
+
+* Authentication
+* Cycle tracking
+* Cycle history
+* AI chatbot
+* AI insights
+* Monthly reports
+* Doctor discovery
+
+</td>
+
+<td width="25%" align="center">
+
+## 🔵 PHASE 2
+
+### INTELLIGENCE
+
+* Pattern detection
+* Personal recommendations
+* Symptom analysis
+* Smarter predictions
+* Live-data AI reports
+
+</td>
+
+<td width="25%" align="center">
+
+## 🟣 PHASE 3
+
+### HEALTHCARE
+
+* Doctor booking
+* Consultation management
+* Reminders
+* Doctor-patient communication
+
+</td>
+
+<td width="25%" align="center">
+
+## 🟠 PHASE 4
+
+### FUTURE
+
+* Wearables
+* Long-term trends
+* Personalized plans
+* Multi-language support
+* Advanced analytics
+
+</td>
+</tr>
+</table>
 
 ---
 
-# ✨ Current Features
+# 🌐 THE BIGGER VISION
 
-## Authentication
+Claim is not intended to be just another period calendar.
 
-* User signup
-* User login
-* JWT authentication
-* Protected routes
-* User-specific data access
-
-## Cycle Tracker
-
-Users can:
-
-* Log cycle start date
-* Log cycle end date
-* Record cycle length
-* Record flow intensity
-* Record symptoms
-* Record pain level
-* View cycle history
-* Update cycle records
-* Delete cycle records
-* Get cycle predictions
-* Get AI-generated cycle insights
-
-## AI Chatbot
-
-The application includes an AI menstrual wellness chatbot that provides general educational information about:
-
-* Periods
-* Menstrual cycles
-* PMS
-* Common symptoms
-* Nutrition
-* Hydration
-* Exercise
-* Rest
-* General reproductive wellness
-
-The chatbot does not diagnose medical conditions or prescribe medication.
-
-## Monthly Report
-
-The monthly report includes:
-
-* Cycle length trends
-* Symptom frequency
-* Flow intensity
-* Mood trends
-* Sleep trends
-* AI-generated monthly wellness insights
-* Visual charts using Recharts
-
-> The backend is being updated so monthly report data is generated from the logged-in user's MongoDB records instead of hardcoded frontend data.
-
-## Doctor Connect
-
-Users can:
-
-* View available doctors
-* View doctor specialties
-* View ratings
-* View experience
-* View location
-* View available consultation slots
-
-Backend doctor API:
+It aims to create a **digital menstrual wellness ecosystem**.
 
 ```text
-GET /api/doctors
+                 🩸 TRACK
+                    │
+                    ▼
+              📊 UNDERSTAND
+                    │
+                    ▼
+                🤖 AI HELP
+                    │
+                    ▼
+              💡 WELLNESS
+                    │
+                    ▼
+              👩‍⚕️ PROFESSIONAL
+                 SUPPORT
 ```
 
-Booking functionality is currently being developed.
+### The goal:
+
+> **Make menstrual health information easier to understand, easier to act on, and easier to connect with appropriate care.**
 
 ---
 
-# 🔌 Important API Routes
+# 🏆 WHY CLAIM?
 
-## Authentication
+<table>
+<tr>
+<td width="25%" align="center">
 
-```text
-POST /api/auth/signup
-POST /api/auth/login
-```
+### 🩸
 
-## Cycle Tracker
+**PERSONAL**
 
-```text
-POST   /api/cycles
-GET    /api/cycles
-GET    /api/cycles/ai-insight
-PUT    /api/cycles/:id
-DELETE /api/cycles/:id
-```
+Built around the user's own cycle history.
 
-All cycle routes require JWT authentication.
+</td>
 
-## Doctors
+<td width="25%" align="center">
 
-```text
-GET /api/doctors
-```
+### 🤖
 
-## Monthly Report
+**INTELLIGENT**
 
-```text
-POST /api/reports/monthly-ai
-```
+Uses AI to transform records into understandable insights.
 
-This route requires authentication.
+</td>
 
-The backend should use the authenticated user's ID to retrieve their cycle data.
+<td width="25%" align="center">
 
----
+### 🌍
 
-# 🎨 Frontend Development Guidelines
+**INCLUSIVE**
 
-When working on the frontend:
+Designed around accessible health education and dignity.
 
-* Reuse existing UI components from `components/ui`.
-* Maintain the existing color/theme system.
-* Use Tailwind CSS for styling.
-* Keep the existing responsive design.
-* Avoid hardcoding user-specific data where an API is available.
-* Use the existing authentication token from `localStorage`.
-* Do not expose API keys in frontend code.
-* Keep components reusable and clean.
+</td>
+
+<td width="25%" align="center">
+
+### 👩‍⚕️
+
+**CONNECTED**
+
+Creates a bridge between wellness tracking and professional support.
+
+</td>
+</tr>
+</table>
 
 ---
 
-# 👩‍💻 Current Frontend Work
+# 🧪 TESTING CHECKLIST
 
-The frontend team should focus on:
+### Authentication
 
-### Doctor Connect
-
-* Connect the Doctor Connect page to `GET /api/doctors`
-* Replace hardcoded doctor data with API data
-* Implement doctor search/filtering if required
-* Display available consultation slots
-* Build the booking UI once the booking API is ready
+* [ ] Signup
+* [ ] Login
+* [ ] Logout
+* [ ] Protected routes
+* [ ] Invalid credentials
 
 ### Cycle Tracker
 
-* Connect cycle history to backend APIs
-* Ensure the UI displays the logged-in user's actual cycles
-* Connect prediction data to the backend
-* Handle loading and error states
+* [ ] Add cycle
+* [ ] View history
+* [ ] Update cycle
+* [ ] Delete cycle
+* [ ] Predictions
+* [ ] AI insights
 
-### Monthly Report
+### AI
 
-* Keep the existing charts and report UI
-* Remove dependency on hardcoded data when backend report data becomes available
-* Display the AI-generated report cleanly
-* Support Markdown formatting in the AI summary if required
-* Add proper loading/error states
+* [ ] Chatbot response
+* [ ] Error handling
+* [ ] Server-side API key
+* [ ] Responsible AI messaging
 
-### General UI
+### Reports
 
-* Check responsive design
-* Fix UI inconsistencies
-* Improve empty states
-* Improve loading states
-* Handle API errors gracefully
-* Test navigation and protected pages
+* [ ] Charts
+* [ ] Live user data
+* [ ] AI summary
+* [ ] Loading state
+* [ ] Error state
+
+### Doctor Connect
+
+* [ ] Doctor API
+* [ ] Doctor cards
+* [ ] Specialty
+* [ ] Ratings
+* [ ] Experience
+* [ ] Location
+* [ ] Consultation slots
 
 ---
 
-# 🧪 Testing
+# 🤝 CONTRIBUTING
 
-Before pushing frontend changes:
+Contributions are welcome.
 
 ```bash
-npm run dev
+git checkout -b feature/your-feature
 ```
 
-Test:
+After making and testing your changes:
 
-* Signup
-* Login
-* Dashboard
-* Cycle tracker
-* Cycle history
-* AI chatbot
-* Monthly report
-* Doctor Connect
-* Logout
-* Protected routes
+```bash
+git add .
+git commit -m "feat: add your feature"
+git push origin feature/your-feature
+```
 
-Make sure the browser console has no errors.
+Open a Pull Request including:
+
+* What changed
+* Why it changed
+* Screenshots where relevant
+* Testing performed
 
 ---
 
-# ⚠️ Important
+# ⚠️ MEDICAL DISCLAIMER
 
-Never commit:
+Claim is a **menstrual wellness and health-education application**.
 
-```text
-.env
-.env.local
-node_modules/
-```
+Information generated by the AI is intended for general educational and wellness purposes and **should not be treated as medical diagnosis, treatment, or professional medical advice**.
 
-API keys, MongoDB credentials, and JWT secrets must remain private.
+Users with concerning, persistent, severe, or unusual symptoms should seek advice from an appropriately qualified healthcare professional.
 
 ---
 
-# 🏆 Hackathon Goal
+# 🌸 CLAIM
 
-Claim aims to provide a single, supportive platform for menstrual wellness by combining:
+<p align="center">
 
-**Cycle Tracking + AI Insights + Wellness Chatbot + Monthly Reports + Doctor Connect**
+### **Know Your Cycle. Understand Your Health.**
 
-The goal is to make menstrual health tracking simple, personalized, and accessible while clearly distinguishing wellness information from professional medical advice.
+**A smarter, safer, more human approach to menstrual wellness.**
 
-```
-```
+<br>
+
+🩸 **Track**   •  
+🧠 **Understand**   •  
+📊 **Learn**   •  
+💙 **Act**   •  
+👩‍⚕️ **Connect**
+
+<br>
+
+**Built with ❤️ using React • Node.js • MongoDB • Gemini AI**
+
+</p>
