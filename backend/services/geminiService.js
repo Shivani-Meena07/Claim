@@ -192,13 +192,97 @@ Rules:
 `;
 
     const response = await ai.models.generateContent({
-      model: "gemini-3.6-flash",
+      model: "gemini-3.5-flash",
       contents: prompt,
     });
 
     return response.text;
   } catch (error) {
     console.error("Gemini monthly report error:", error);
+    throw error;
+  }
+};
+
+// ===============================
+// AI WELLNESS COACH RECOMMENDATIONS
+// ===============================
+
+const generateWellnessRecommendations = async (wellnessData) => {
+  try {
+    const prompt = `
+You are an AI wellness coach for a menstrual wellness application.
+
+Use the user's recent cycle, mood, and sleep data to provide personalized
+GENERAL WELLNESS recommendations.
+
+User wellness data:
+
+Cycle data:
+${JSON.stringify(wellnessData.cycles)}
+
+Mood data:
+${JSON.stringify(wellnessData.moods)}
+
+Sleep data:
+${JSON.stringify(wellnessData.sleep)}
+
+Return exactly 6 recommendations.
+
+Each recommendation must have:
+
+- category: one of "nutrition", "exercise", "yoga", "hydration", "sleep", "self-care"
+- title: short recommendation title
+- description: one or two concise sentences
+- time: estimated time such as "10 min", "15 min", or "20 min"
+
+Return ONLY valid JSON in this exact format:
+
+{
+  "recommendations": [
+    {
+      "category": "nutrition",
+      "title": "Example title",
+      "description": "Example description.",
+      "time": "15 min"
+    }
+  ]
+}
+
+Rules:
+
+- Give gentle, practical wellness suggestions.
+- Personalize recommendations using the logged data.
+- Do not diagnose any medical condition.
+- Do not prescribe medication or medication dosages.
+- Do not claim certainty about the user's health.
+- Do not invent symptoms or data that are not present.
+- Recommendations should be appropriate for general menstrual wellness.
+- If the data suggests something concerning, recommend discussing it with
+  a qualified healthcare professional.
+- Keep descriptions concise.
+- Do not include Markdown.
+- Do not include explanations outside the JSON.
+`;
+
+    const response = await ai.models.generateContent({
+      model: "gemini-3.6-flash",
+      contents: prompt,
+    });
+
+    const text = response.text.trim();
+
+    // Remove accidental markdown code fences if Gemini adds them
+    const cleanedText = text
+      .replace(/^```json\s*/i, "")
+      .replace(/^```\s*/i, "")
+      .replace(/\s*```$/i, "")
+      .trim();
+
+    const parsed = JSON.parse(cleanedText);
+
+    return parsed.recommendations || [];
+  } catch (error) {
+    console.error("Gemini wellness recommendations error:", error);
     throw error;
   }
 };
@@ -211,4 +295,5 @@ module.exports = {
   generateCycleInsight,
   generateChatbotResponse,
   generateMonthlyReport,
+  generateWellnessRecommendations,
 };

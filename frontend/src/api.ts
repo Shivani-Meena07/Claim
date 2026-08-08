@@ -59,4 +59,9 @@ export const getCycleAIInsight = async () => {
   return response.data
 }
 
+export const getWellnessRecommendations = async () => {
+  const response = await api.get('/wellness/recommendations')
+  return response.data
+}
+
 export default api

@@ -134,6 +134,9 @@ function formatAISummary(text: string) {
 
 export default function MonthlyReport() {
   const [aiSummary, setAiSummary] = useState('')
+  const [aiLoading, setAiLoading] = useState(true)
+  const [aiError, setAiError] = useState('')
+
   const [reportData, setReportData] = useState<ReportData>({
     cycleLengths: [],
     symptomFrequency: [],
@@ -141,9 +144,6 @@ export default function MonthlyReport() {
     moodTrend: [],
     sleepTrend: [],
   })
-
-  const [aiLoading, setAiLoading] = useState(true)
-  const [aiError, setAiError] = useState('')
 
   useEffect(() => {
     const generateReport = async () => {
@@ -213,7 +213,7 @@ export default function MonthlyReport() {
   const currentYear = new Date().getFullYear()
 
   /* =========================================================
-     MOOD DATA FOR CHART
+     MOOD DATA
      ========================================================= */
 
   const formattedMoodTrend = moodTrend.map((entry) => ({
@@ -225,7 +225,7 @@ export default function MonthlyReport() {
   }))
 
   /* =========================================================
-     SLEEP DATA FOR CHART
+     SLEEP DATA
      ========================================================= */
 
   const formattedSleepTrend = sleepTrend.map((entry) => ({
@@ -237,7 +237,7 @@ export default function MonthlyReport() {
   }))
 
   /* =========================================================
-     FLOW DATA WITH COLORS
+     FLOW DATA
      ========================================================= */
 
   const formattedFlowSplit = flowSplit.map((entry, index) => ({
@@ -324,7 +324,7 @@ export default function MonthlyReport() {
       </Card>
 
       {/* =====================================================
-          RED FLAG DETECTION
+          REPORT NOTICE
           ===================================================== */}
 
       {!aiLoading && cycleLengths.length > 1 && (
@@ -380,6 +380,7 @@ export default function MonthlyReport() {
                     data={cycleLengths}
                     margin={{ left: -20, right: 10 }}
                   >
+
                     <CartesianGrid
                       strokeDasharray="3 3"
                       stroke="var(--border)"
@@ -411,6 +412,7 @@ export default function MonthlyReport() {
                       strokeWidth={2.5}
                       dot={{ r: 3 }}
                     />
+
                   </LineChart>
                 </ResponsiveContainer>
               </div>
@@ -441,6 +443,7 @@ export default function MonthlyReport() {
                     data={symptomFrequency}
                     margin={{ left: -20, right: 10 }}
                   >
+
                     <CartesianGrid
                       strokeDasharray="3 3"
                       stroke="var(--border)"
@@ -469,6 +472,7 @@ export default function MonthlyReport() {
                       fill="var(--dusk)"
                       radius={[6, 6, 0, 0]}
                     />
+
                   </BarChart>
                 </ResponsiveContainer>
               </div>
@@ -505,12 +509,14 @@ export default function MonthlyReport() {
                       outerRadius={80}
                       paddingAngle={3}
                     >
+
                       {formattedFlowSplit.map((entry) => (
                         <Cell
                           key={entry.name}
                           fill={entry.color}
                         />
                       ))}
+
                     </Pie>
 
                     <Tooltip contentStyle={chartTooltip} />
@@ -560,6 +566,7 @@ export default function MonthlyReport() {
                         x2="0"
                         y2="1"
                       >
+
                         <stop
                           offset="5%"
                           stopColor="var(--sun)"
@@ -571,6 +578,7 @@ export default function MonthlyReport() {
                           stopColor="var(--sun)"
                           stopOpacity={0}
                         />
+
                       </linearGradient>
                     </defs>
 

@@ -11,6 +11,7 @@ const reportRoutes = require("./routes/reportRoutes");
 const bookingRoutes = require("./routes/bookingRoutes");
 const moodRoutes = require("./routes/moodRoutes");
 const sleepRoutes = require("./routes/sleepRoutes");
+const wellnessRoutes = require("./routes/wellnessRoutes");
 
 const app = express();
 
@@ -25,6 +26,7 @@ app.use("/api/reports", reportRoutes);
 app.use("/api/bookings", bookingRoutes);
 app.use("/api/mood", moodRoutes);
 app.use("/api/sleep", sleepRoutes);
+app.use("/api/wellness", wellnessRoutes);
 
 connectDB();
 
