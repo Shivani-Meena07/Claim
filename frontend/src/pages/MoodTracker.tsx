@@ -11,6 +11,8 @@ import {
 import { Card, CardContent } from '../components/ui/Card'
 import { Button } from '../components/ui/Button'
 
+const API_URL = import.meta.env.VITE_API_URL
+
 const MOODS = [
   { emoji: '😢', label: 'Low', value: 1 },
   { emoji: '😕', label: 'Down', value: 2 },
@@ -57,7 +59,8 @@ export default function MoodTracker() {
   // ===============================
 
   const [sleepHours, setSleepHours] = useState('')
-  const [selectedSleepQuality, setSelectedSleepQuality] = useState<number | null>(null)
+  const [selectedSleepQuality, setSelectedSleepQuality] =
+    useState<number | null>(null)
   const [sleepHistory, setSleepHistory] = useState<SleepEntry[]>([])
   const [sleepLoading, setSleepLoading] = useState(true)
   const [sleepSaving, setSleepSaving] = useState(false)
@@ -78,7 +81,7 @@ export default function MoodTracker() {
         throw new Error('Authentication required')
       }
 
-      const response = await fetch('/api/mood', {
+      const response = await fetch(`${API_URL}/api/mood`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -118,7 +121,7 @@ export default function MoodTracker() {
         throw new Error('Authentication required')
       }
 
-      const response = await fetch('/api/sleep', {
+      const response = await fetch(`${API_URL}/api/sleep`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -127,7 +130,9 @@ export default function MoodTracker() {
       const data = await response.json()
 
       if (!response.ok) {
-        throw new Error(data.message || 'Failed to fetch sleep data')
+        throw new Error(
+          data.message || 'Failed to fetch sleep data'
+        )
       }
 
       setSleepHistory(data.sleep || [])
@@ -166,7 +171,7 @@ export default function MoodTracker() {
         throw new Error('Authentication required')
       }
 
-      const response = await fetch('/api/mood', {
+      const response = await fetch(`${API_URL}/api/mood`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -181,7 +186,9 @@ export default function MoodTracker() {
       const data = await response.json()
 
       if (!response.ok) {
-        throw new Error(data.message || 'Failed to save mood')
+        throw new Error(
+          data.message || 'Failed to save mood'
+        )
       }
 
       setMoodHistory((current) => [
@@ -228,7 +235,7 @@ export default function MoodTracker() {
         throw new Error('Authentication required')
       }
 
-      const response = await fetch('/api/sleep', {
+      const response = await fetch(`${API_URL}/api/sleep`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -243,7 +250,9 @@ export default function MoodTracker() {
       const data = await response.json()
 
       if (!response.ok) {
-        throw new Error(data.message || 'Failed to save sleep data')
+        throw new Error(
+          data.message || 'Failed to save sleep data'
+        )
       }
 
       setSleepHistory((current) => [
@@ -301,8 +310,7 @@ export default function MoodTracker() {
   }, [sleepHistory])
 
   return (
-    <div className="space-y-5">
-
+    <div className="space-y-6">
       {/* ===============================
           HEADER
       =============================== */}
@@ -397,7 +405,10 @@ export default function MoodTracker() {
             </p>
           ) : (
             <div className="h-64">
-              <ResponsiveContainer width="100%" height="100%">
+              <ResponsiveContainer
+                width="100%"
+                height="100%"
+              >
                 <AreaChart
                   data={moodChartData}
                   margin={{ left: -20, right: 10 }}
@@ -557,7 +568,10 @@ export default function MoodTracker() {
             </p>
           ) : (
             <div className="h-64">
-              <ResponsiveContainer width="100%" height="100%">
+              <ResponsiveContainer
+                width="100%"
+                height="100%"
+              >
                 <AreaChart
                   data={sleepChartData}
                   margin={{ left: -20, right: 10 }}
@@ -656,7 +670,6 @@ export default function MoodTracker() {
           )}
         </CardContent>
       </Card>
-
     </div>
   )
 }
