@@ -12,7 +12,7 @@ const bookingRoutes = require("./routes/bookingRoutes");
 const moodRoutes = require("./routes/moodRoutes");
 const sleepRoutes = require("./routes/sleepRoutes");
 const wellnessRoutes = require("./routes/wellnessRoutes");
-
+const communityRoutes = require("./routes/communityRoutes");
 const app = express();
 
 app.use(cors());
@@ -27,6 +27,7 @@ app.use("/api/bookings", bookingRoutes);
 app.use("/api/mood", moodRoutes);
 app.use("/api/sleep", sleepRoutes);
 app.use("/api/wellness", wellnessRoutes);
+app.use("/api/community", communityRoutes);
 
 connectDB();
 
