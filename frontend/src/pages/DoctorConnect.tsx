@@ -1,9 +1,10 @@
-
 import { useEffect, useState } from 'react'
 import { Star, MapPin, Briefcase, CheckCircle2 } from 'lucide-react'
 import { Card, CardContent } from '../components/ui/Card'
 import { Button } from '../components/ui/Button'
 import { Modal } from '../components/ui/Modal'
+
+const API_URL = import.meta.env.VITE_API_URL
 
 type Doctor = {
   _id: string
@@ -35,7 +36,7 @@ export default function DoctorConnect() {
       try {
         console.log('Starting doctor request...')
 
-        const response = await fetch('/api/doctors')
+        const response = await fetch(`${API_URL}/api/doctors`)
 
         console.log('Response received:', response.status)
 
@@ -84,7 +85,7 @@ export default function DoctorConnect() {
         return
       }
 
-      const response = await fetch('/api/bookings', {
+      const response = await fetch(`${API_URL}/api/bookings`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -120,10 +121,10 @@ export default function DoctorConnect() {
   }
 
   return (
-    <div>
-      <div className="flex items-center justify-between mb-6">
+    <div className="space-y-6">
+      <div className="flex items-start justify-between gap-4">
         <div>
-          <h1 className="font-display text-2xl">
+          <h1 className="font-display text-3xl">
             Doctor Connect
           </h1>
 
