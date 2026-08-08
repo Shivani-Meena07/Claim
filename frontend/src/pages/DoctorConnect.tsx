@@ -21,53 +21,121 @@ export default function DoctorConnect() {
   const [doctors, setDoctors] = useState<Doctor[]>([])
   const [booking, setBooking] = useState<Doctor | null>(null)
   const [slot, setSlot] = useState<string | null>(null)
+  const [date, setDate] = useState('')
   const [confirmed, setConfirmed] = useState(false)
+
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
 
+  const [bookingLoading, setBookingLoading] = useState(false)
+  const [bookingError, setBookingError] = useState('')
+
   useEffect(() => {
-  const fetchDoctors = async () => {
-    try {
-      console.log('Starting doctor request...')
+    const fetchDoctors = async () => {
+      try {
+        console.log('Starting doctor request...')
 
-      const response = await fetch('/api/doctors')
+        const response = await fetch('/api/doctors')
 
-      console.log('Response received:', response.status)
+        console.log('Response received:', response.status)
 
-      const data = await response.json()
+        const data = await response.json()
 
-      console.log('Doctor data:', data)
+        console.log('Doctor data:', data)
 
-      setDoctors(data.doctors)
-    } catch (err) {
-      console.error('Doctor request failed:', err)
-      setError('Unable to load doctors. Please try again.')
-    } finally {
-      setLoading(false)
+        if (!response.ok) {
+          throw new Error(data.message || 'Failed to fetch doctors')
+        }
+
+        setDoctors(data.doctors || [])
+      } catch (err) {
+        console.error('Doctor request failed:', err)
+        setError('Unable to load doctors. Please try again.')
+      } finally {
+        setLoading(false)
+      }
     }
-  }
 
-  fetchDoctors()
-}, [])
+    fetchDoctors()
+  }, [])
 
   function closeModal() {
     setBooking(null)
     setSlot(null)
+    setDate('')
     setConfirmed(false)
+    setBookingError('')
+    setBookingLoading(false)
+  }
+
+  const handleBooking = async () => {
+    if (!booking || !slot || !date) {
+      return
+    }
+
+    try {
+      setBookingLoading(true)
+      setBookingError('')
+
+      const token = localStorage.getItem('token')
+
+      if (!token) {
+        setBookingError('Please log in to book a consultation.')
+        return
+      }
+
+      const response = await fetch('/api/bookings', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          doctorId: booking._id,
+          date,
+          time: slot,
+        }),
+      })
+
+      const data = await response.json()
+
+      console.log('Booking response:', data)
+
+      if (!response.ok) {
+        setBookingError(
+          data.message || 'Failed to book consultation.'
+        )
+        return
+      }
+
+      setConfirmed(true)
+    } catch (error) {
+      console.error('Booking error:', error)
+      setBookingError(
+        'Unable to book consultation. Please try again.'
+      )
+    } finally {
+      setBookingLoading(false)
+    }
   }
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="font-display text-2xl">Doctor connect</h1>
-        <p className="text-muted-foreground">
-          Book verified specialists near you.
-        </p>
-      </div>
+    <div>
+      <div className="flex items-center justify-between mb-6">
+        <div>
+          <h1 className="font-display text-2xl">
+            Doctor Connect
+          </h1>
 
-      <Button variant="outline">
-        Emergency contact
-      </Button>
+          <p className="text-sm text-muted-foreground mt-1">
+            Book verified specialists near you.
+          </p>
+        </div>
+
+        <Button variant="outline">
+          Emergency contact
+        </Button>
+      </div>
 
       {loading && (
         <p className="text-sm text-muted-foreground">
@@ -132,7 +200,9 @@ export default function DoctorConnect() {
                     onClick={() => {
                       setBooking(doctor)
                       setSlot(null)
+                      setDate('')
                       setConfirmed(false)
+                      setBookingError('')
                     }}
                   >
                     Book consultation
@@ -172,8 +242,7 @@ export default function DoctorConnect() {
             </p>
 
             <p className="text-sm text-muted-foreground">
-              A confirmation has been sent to your email. You can
-              reschedule from Settings.
+              Your consultation has been successfully booked.
             </p>
 
             <Button
@@ -190,6 +259,23 @@ export default function DoctorConnect() {
             </p>
 
             <div>
+              <label className="text-sm font-medium">
+                Select date
+              </label>
+
+              <input
+                type="date"
+                value={date}
+                min={new Date().toISOString().split('T')[0]}
+                onChange={(e) => {
+                  setDate(e.target.value)
+                  setBookingError('')
+                }}
+                className="w-full mt-2 px-3 py-2.5 rounded-xl border border-border bg-background"
+              />
+            </div>
+
+            <div>
               <p className="text-sm font-medium mb-2.5">
                 Choose a time slot
               </p>
@@ -198,7 +284,10 @@ export default function DoctorConnect() {
                 {booking?.availableSlots.map((availableSlot) => (
                   <button
                     key={availableSlot}
-                    onClick={() => setSlot(availableSlot)}
+                    onClick={() => {
+                      setSlot(availableSlot)
+                      setBookingError('')
+                    }}
                     className={`px-3 py-2.5 rounded-xl text-sm border transition-colors focus-ring ${
                       slot === availableSlot
                         ? 'bg-bloom text-white border-bloom'
@@ -211,12 +300,20 @@ export default function DoctorConnect() {
               </div>
             </div>
 
+            {bookingError && (
+              <p className="text-sm text-red-500">
+                {bookingError}
+              </p>
+            )}
+
             <Button
               className="w-full"
-              disabled={!slot}
-              onClick={() => setConfirmed(true)}
+              disabled={!slot || !date || bookingLoading}
+              onClick={handleBooking}
             >
-              Confirm booking
+              {bookingLoading
+                ? 'Booking...'
+                : 'Confirm booking'}
             </Button>
           </div>
         )}

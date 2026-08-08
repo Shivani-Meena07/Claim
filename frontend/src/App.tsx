@@ -13,6 +13,7 @@ import WellnessCoach from './pages/WellnessCoach'
 import Chatbot from './pages/Chatbot'
 import Community from './pages/Community'
 import DoctorConnect from './pages/DoctorConnect'
+import Bookings from './pages/Bookings'
 import MentalWellness from './pages/MentalWellness'
 import MonthlyReport from './pages/MonthlyReport'
 import Settings from './pages/Settings'
@@ -35,6 +36,7 @@ export default function App() {
           <Route path="chat" element={<Chatbot />} />
           <Route path="community" element={<Community />} />
           <Route path="doctors" element={<DoctorConnect />} />
+          <Route path="bookings" element={<Bookings />} />
           <Route path="mental-wellness" element={<MentalWellness />} />
           <Route path="report" element={<MonthlyReport />} />
           <Route path="settings" element={<Settings />} />
