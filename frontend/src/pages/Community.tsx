@@ -47,8 +47,7 @@ const TAGS = [
   'General',
 ]
 
-const API_URL = 'http://localhost:5000/api/community'
-
+const API_URL = `${import.meta.env.VITE_API_URL}/api/community`
 export default function Community() {
   const [posts, setPosts] = useState<Post[]>([])
   const [comments, setComments] = useState<Comment[]>([])
