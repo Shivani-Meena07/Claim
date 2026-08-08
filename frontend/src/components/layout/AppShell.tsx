@@ -16,7 +16,6 @@ import {
   Sun,
   Bell,
   Menu,
-  X,
   LogOut,
 } from 'lucide-react'
 import { cn } from '../../lib/utils'
