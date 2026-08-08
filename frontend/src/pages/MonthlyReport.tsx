@@ -21,41 +21,46 @@ import { Download, Sparkles, AlertTriangle } from 'lucide-react'
 import { Card, CardContent, CardTitle } from '../components/ui/Card'
 import { Button } from '../components/ui/Button'
 
-const CYCLE_LENGTHS = [
-  { month: 'Mar', length: 29 },
-  { month: 'Apr', length: 27 },
-  { month: 'May', length: 28 },
-  { month: 'Jun', length: 30 },
-  { month: 'Jul', length: 26 },
-  { month: 'Aug', length: 28 },
-]
+type CycleLength = {
+  month: string
+  length: number
+}
 
-const SYMPTOM_FREQ = [
-  { symptom: 'Cramps', count: 18 },
-  { symptom: 'Fatigue', count: 14 },
-  { symptom: 'Headache', count: 9 },
-  { symptom: 'Bloating', count: 12 },
-  { symptom: 'Acne', count: 6 },
-]
+type SymptomFrequency = {
+  symptom: string
+  count: number
+}
 
-const FLOW_SPLIT = [
-  { name: 'Light', value: 2, color: 'var(--sun)' },
-  { name: 'Medium', value: 3, color: 'var(--bloom)' },
-  { name: 'Heavy', value: 1, color: 'var(--dusk)' },
-]
+type FlowSplit = {
+  name: string
+  value: number
+}
 
-const MOOD_TREND = [
-  { week: 'W1', mood: 3.8 },
-  { week: 'W2', mood: 4.2 },
-  { week: 'W3', mood: 2.9 },
-  { week: 'W4', mood: 3.6 },
-]
+type MoodTrend = {
+  date: string
+  mood: number
+  note?: string
+}
 
-const SLEEP_TREND = [
-  { week: 'W1', hours: 7.2 },
-  { week: 'W2', hours: 6.8 },
-  { week: 'W3', hours: 6.1 },
-  { week: 'W4', hours: 7.5 },
+type SleepTrend = {
+  date: string
+  hours: number
+  quality?: number
+}
+
+type ReportData = {
+  cycleLengths: CycleLength[]
+  symptomFrequency: SymptomFrequency[]
+  flowSplit: FlowSplit[]
+  moodTrend: MoodTrend[]
+  sleepTrend: SleepTrend[]
+}
+
+const FLOW_COLORS = [
+  'var(--sun)',
+  'var(--bloom)',
+  'var(--dusk)',
+  'var(--sprout)',
 ]
 
 const chartTooltip = {
@@ -124,140 +129,129 @@ function formatAISummary(text: string) {
 }
 
 /* =========================================================
-   CLEAN AI TEXT
-   ========================================================= */
-
-function cleanSummaryText(text: string) {
-  return text
-    .replace(/\*\*/g, '')
-    .replace(/__/g, '')
-    .replace(/^\s*[-*]\s*/gm, '')
-    .replace(/^\s*\d+\.\s*/gm, '')
-    .replace(/\s+/g, ' ')
-    .trim()
-}
-
-/* =========================================================
-   BULLET EXTRACTION
-   ========================================================= */
-
-function extractBulletItems(text: string) {
-  /*
-   * Handles:
-   *
-   * - First suggestion
-   * - Second suggestion
-   *
-   * * First suggestion
-   * * Second suggestion
-   *
-   * 1. First suggestion
-   * 2. Second suggestion
-   */
-
-  const items = text
-    .split(/\n(?=\s*(?:[-*•]|\d+\.)\s+)/)
-    .map((item) =>
-      item
-        .replace(/^\s*(?:[-*•]|\d+\.)\s*/, '')
-        .trim()
-    )
-    .filter(Boolean)
-
-  /*
-   * If Gemini puts multiple "*" bullets on the same line.
-   */
-  if (items.length === 1 && /(?:^|\s)[-*•]\s+/.test(text)) {
-    const inlineItems = text
-      .split(/\s+(?=[-*•]\s+)/)
-      .map((item) =>
-        item
-          .replace(/^\s*[-*•]\s*/, '')
-          .trim()
-      )
-      .filter(Boolean)
-
-    if (inlineItems.length > 1) {
-      return inlineItems
-    }
-  }
-
-  return items
-}
-
-function formatBulletItem(text: string) {
-  const cleaned = cleanSummaryText(text)
-
-  /*
-   * Make "Cramp Relief:" or "Prioritize Rest:" bold.
-   */
-  const colonIndex = cleaned.indexOf(':')
-
-  if (colonIndex > 0 && colonIndex < 60) {
-    const title = cleaned.slice(0, colonIndex)
-    const description = cleaned.slice(colonIndex + 1).trim()
-
-    return (
-      <>
-        <span className="font-semibold text-white">
-          {title}:
-        </span>{' '}
-        {description}
-      </>
-    )
-  }
-
-  return cleaned
-}
-
-/* =========================================================
    MONTHLY REPORT
    ========================================================= */
 
 export default function MonthlyReport() {
   const [aiSummary, setAiSummary] = useState('')
+  const [reportData, setReportData] = useState<ReportData>({
+    cycleLengths: [],
+    symptomFrequency: [],
+    flowSplit: [],
+    moodTrend: [],
+    sleepTrend: [],
+  })
+
   const [aiLoading, setAiLoading] = useState(true)
   const [aiError, setAiError] = useState('')
 
- useEffect(() => {
-  const generateReport = async () => {
-    try {
-      setAiLoading(true)
-      setAiError('')
+  useEffect(() => {
+    const generateReport = async () => {
+      try {
+        setAiLoading(true)
+        setAiError('')
 
-      const token = localStorage.getItem('token')
+        const token = localStorage.getItem('token')
 
-      const response = await fetch('/api/reports/monthly-ai', {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      })
+        if (!token) {
+          throw new Error('Authentication required')
+        }
 
-      const data = await response.json()
+        const response = await fetch('/api/reports/monthly-ai', {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        })
 
-      if (!response.ok) {
-        throw new Error(
-          data.message || 'Failed to generate AI report'
-        )
+        const data = await response.json()
+
+        if (!response.ok) {
+          throw new Error(
+            data.message || 'Failed to generate AI report'
+          )
+        }
+
+        setAiSummary(data.summary || '')
+
+        setReportData({
+          cycleLengths: data.reportData?.cycleLengths || [],
+          symptomFrequency:
+            data.reportData?.symptomFrequency || [],
+          flowSplit: data.reportData?.flowSplit || [],
+          moodTrend: data.reportData?.moodTrend || [],
+          sleepTrend: data.reportData?.sleepTrend || [],
+        })
+      } catch (error) {
+        console.error('Monthly report AI error:', error)
+        setAiError('Unable to generate AI summary.')
+      } finally {
+        setAiLoading(false)
       }
-
-      setAiSummary(data.summary)
-    } catch (error) {
-      console.error('Monthly report AI error:', error)
-      setAiError('Unable to generate AI summary.')
-    } finally {
-      setAiLoading(false)
     }
-  }
 
-  generateReport()
-}, []) 
+    generateReport()
+  }, [])
+
+  const {
+    cycleLengths,
+    symptomFrequency,
+    flowSplit,
+    moodTrend,
+    sleepTrend,
+  } = reportData
+
+  /* =========================================================
+     DYNAMIC MONTH
+     ========================================================= */
+
+  const latestMonth =
+    cycleLengths.length > 0
+      ? cycleLengths[cycleLengths.length - 1].month
+      : 'Current'
+
+  const currentYear = new Date().getFullYear()
+
+  /* =========================================================
+     MOOD DATA FOR CHART
+     ========================================================= */
+
+  const formattedMoodTrend = moodTrend.map((entry) => ({
+    ...entry,
+    label: new Date(entry.date).toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
+    }),
+  }))
+
+  /* =========================================================
+     SLEEP DATA FOR CHART
+     ========================================================= */
+
+  const formattedSleepTrend = sleepTrend.map((entry) => ({
+    ...entry,
+    label: new Date(entry.date).toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
+    }),
+  }))
+
+  /* =========================================================
+     FLOW DATA WITH COLORS
+     ========================================================= */
+
+  const formattedFlowSplit = flowSplit.map((entry, index) => ({
+    ...entry,
+    color: FLOW_COLORS[index % FLOW_COLORS.length],
+  }))
 
   return (
     <div className="space-y-6">
 
-      {/* Header */}
+      {/* =====================================================
+          HEADER
+          ===================================================== */}
+
       <div className="flex items-center justify-between gap-4">
         <div>
           <h1 className="font-display text-2xl">
@@ -265,7 +259,7 @@ export default function MonthlyReport() {
           </h1>
 
           <p className="text-sm text-muted-foreground mt-1">
-            August 2026 summary
+            {latestMonth} {currentYear} summary
           </p>
         </div>
 
@@ -282,7 +276,6 @@ export default function MonthlyReport() {
       <Card className="overflow-hidden border-0 bg-gradient-to-r from-dusk to-bloom text-white">
         <CardContent className="p-6">
 
-          {/* AI header */}
           <div className="flex items-center gap-3 mb-6">
 
             <div className="h-9 w-9 rounded-full bg-white/15 flex items-center justify-center shrink-0">
@@ -301,7 +294,6 @@ export default function MonthlyReport() {
 
           </div>
 
-          {/* AI content */}
           {aiLoading ? (
             <div className="space-y-3">
               <div className="h-4 w-3/4 rounded bg-white/15 animate-pulse" />
@@ -319,7 +311,6 @@ export default function MonthlyReport() {
             formatAISummary(aiSummary)
           )}
 
-          {/* Disclaimer */}
           {!aiLoading && !aiError && (
             <div className="mt-6 pt-4 border-t border-white/10">
               <p className="text-[11px] leading-5 text-white/55">
@@ -336,28 +327,30 @@ export default function MonthlyReport() {
           RED FLAG DETECTION
           ===================================================== */}
 
-      <Card className="bg-sun-soft border-sun/20">
-        <CardContent className="flex items-start gap-3">
+      {!aiLoading && cycleLengths.length > 1 && (
+        <Card className="bg-sun-soft border-sun/20">
+          <CardContent className="flex items-start gap-3">
 
-          <AlertTriangle
-            size={20}
-            className="text-sun shrink-0 mt-0.5"
-          />
+            <AlertTriangle
+              size={20}
+              className="text-sun shrink-0 mt-0.5"
+            />
 
-          <div>
-            <p className="font-medium text-sun">
-              Worth a look: cycle length varied by 4 days this month
-            </p>
+            <div>
+              <p className="font-medium text-sun">
+                Cycle length tracking
+              </p>
 
-            <p className="text-sm text-sun/80 mt-1">
-              This is within normal variation for most people, but if it
-              continues for 2+ more cycles, it may be worth mentioning to a
-              doctor. Nothing urgent — just flagging it early.
-            </p>
-          </div>
+              <p className="text-sm text-sun/80 mt-1">
+                Your report is based on the cycle data you have logged.
+                Continue tracking your cycles to identify meaningful
+                patterns over time.
+              </p>
+            </div>
 
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+      )}
 
       {/* =====================================================
           CHARTS
@@ -365,258 +358,323 @@ export default function MonthlyReport() {
 
       <div className="grid lg:grid-cols-2 gap-5">
 
-        {/* Cycle length */}
+        {/* ===================================================
+            CYCLE LENGTH
+            =================================================== */}
+
         <Card>
           <CardContent>
+
             <CardTitle className="mb-4">
-              Cycle length (6 months)
+              Cycle length ({cycleLengths.length} logged)
             </CardTitle>
 
-            <div className="h-56">
-              <ResponsiveContainer width="100%" height="100%">
-                <LineChart
-                  data={CYCLE_LENGTHS}
-                  margin={{ left: -20, right: 10 }}
-                >
-                  <CartesianGrid
-                    strokeDasharray="3 3"
-                    stroke="var(--border)"
-                    vertical={false}
-                  />
+            {cycleLengths.length === 0 ? (
+              <p className="text-sm text-muted-foreground">
+                No cycle length data available yet.
+              </p>
+            ) : (
+              <div className="h-56">
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart
+                    data={cycleLengths}
+                    margin={{ left: -20, right: 10 }}
+                  >
+                    <CartesianGrid
+                      strokeDasharray="3 3"
+                      stroke="var(--border)"
+                      vertical={false}
+                    />
 
-                  <XAxis
-                    dataKey="month"
-                    stroke="var(--muted-foreground)"
-                    fontSize={12}
-                    tickLine={false}
-                    axisLine={false}
-                  />
+                    <XAxis
+                      dataKey="month"
+                      stroke="var(--muted-foreground)"
+                      fontSize={12}
+                      tickLine={false}
+                      axisLine={false}
+                    />
 
-                  <YAxis
-                    domain={[24, 32]}
-                    stroke="var(--muted-foreground)"
-                    fontSize={12}
-                    tickLine={false}
-                    axisLine={false}
-                  />
+                    <YAxis
+                      domain={['auto', 'auto']}
+                      stroke="var(--muted-foreground)"
+                      fontSize={12}
+                      tickLine={false}
+                      axisLine={false}
+                    />
 
-                  <Tooltip contentStyle={chartTooltip} />
+                    <Tooltip contentStyle={chartTooltip} />
 
-                  <Line
-                    type="monotone"
-                    dataKey="length"
-                    stroke="var(--bloom)"
-                    strokeWidth={2.5}
-                    dot={{ r: 3 }}
-                  />
-                </LineChart>
-              </ResponsiveContainer>
-            </div>
+                    <Line
+                      type="monotone"
+                      dataKey="length"
+                      stroke="var(--bloom)"
+                      strokeWidth={2.5}
+                      dot={{ r: 3 }}
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
+            )}
+
           </CardContent>
         </Card>
 
-        {/* Symptom frequency */}
+        {/* ===================================================
+            SYMPTOM FREQUENCY
+            =================================================== */}
+
         <Card>
           <CardContent>
+
             <CardTitle className="mb-4">
               Symptom frequency
             </CardTitle>
 
-            <div className="h-56">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart
-                  data={SYMPTOM_FREQ}
-                  margin={{ left: -20, right: 10 }}
-                >
-                  <CartesianGrid
-                    strokeDasharray="3 3"
-                    stroke="var(--border)"
-                    vertical={false}
-                  />
+            {symptomFrequency.length === 0 ? (
+              <p className="text-sm text-muted-foreground">
+                No symptom data logged yet.
+              </p>
+            ) : (
+              <div className="h-56">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart
+                    data={symptomFrequency}
+                    margin={{ left: -20, right: 10 }}
+                  >
+                    <CartesianGrid
+                      strokeDasharray="3 3"
+                      stroke="var(--border)"
+                      vertical={false}
+                    />
 
-                  <XAxis
-                    dataKey="symptom"
-                    stroke="var(--muted-foreground)"
-                    fontSize={11}
-                    tickLine={false}
-                    axisLine={false}
-                  />
+                    <XAxis
+                      dataKey="symptom"
+                      stroke="var(--muted-foreground)"
+                      fontSize={11}
+                      tickLine={false}
+                      axisLine={false}
+                    />
 
-                  <YAxis
-                    stroke="var(--muted-foreground)"
-                    fontSize={12}
-                    tickLine={false}
-                    axisLine={false}
-                  />
+                    <YAxis
+                      stroke="var(--muted-foreground)"
+                      fontSize={12}
+                      tickLine={false}
+                      axisLine={false}
+                    />
 
-                  <Tooltip contentStyle={chartTooltip} />
+                    <Tooltip contentStyle={chartTooltip} />
 
-                  <Bar
-                    dataKey="count"
-                    fill="var(--dusk)"
-                    radius={[6, 6, 0, 0]}
-                  />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
+                    <Bar
+                      dataKey="count"
+                      fill="var(--dusk)"
+                      radius={[6, 6, 0, 0]}
+                    />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            )}
+
           </CardContent>
         </Card>
 
-        {/* Flow intensity */}
+        {/* ===================================================
+            FLOW INTENSITY
+            =================================================== */}
+
         <Card>
           <CardContent>
+
             <CardTitle className="mb-4">
               Flow intensity split
             </CardTitle>
 
-            <div className="h-56">
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    data={FLOW_SPLIT}
-                    dataKey="value"
-                    nameKey="name"
-                    innerRadius={50}
-                    outerRadius={80}
-                    paddingAngle={3}
-                  >
-                    {FLOW_SPLIT.map((f) => (
-                      <Cell
-                        key={f.name}
-                        fill={f.color}
-                      />
-                    ))}
-                  </Pie>
+            {formattedFlowSplit.length === 0 ? (
+              <p className="text-sm text-muted-foreground">
+                No flow data logged yet.
+              </p>
+            ) : (
+              <div className="h-56">
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
 
-                  <Tooltip contentStyle={chartTooltip} />
+                    <Pie
+                      data={formattedFlowSplit}
+                      dataKey="value"
+                      nameKey="name"
+                      innerRadius={50}
+                      outerRadius={80}
+                      paddingAngle={3}
+                    >
+                      {formattedFlowSplit.map((entry) => (
+                        <Cell
+                          key={entry.name}
+                          fill={entry.color}
+                        />
+                      ))}
+                    </Pie>
 
-                  <Legend
-                    iconType="circle"
-                    wrapperStyle={{ fontSize: 12 }}
-                  />
-                </PieChart>
-              </ResponsiveContainer>
-            </div>
+                    <Tooltip contentStyle={chartTooltip} />
+
+                    <Legend
+                      iconType="circle"
+                      wrapperStyle={{ fontSize: 12 }}
+                    />
+
+                  </PieChart>
+                </ResponsiveContainer>
+              </div>
+            )}
+
           </CardContent>
         </Card>
 
-        {/* Mood trend */}
+        {/* ===================================================
+            MOOD TREND
+            =================================================== */}
+
         <Card>
           <CardContent>
+
             <CardTitle className="mb-4">
               Mood trend
             </CardTitle>
 
-            <div className="h-56">
-              <ResponsiveContainer width="100%" height="100%">
-                <AreaChart
-                  data={MOOD_TREND}
-                  margin={{ left: -20, right: 10 }}
-                >
-                  <defs>
-                    <linearGradient
-                      id="reportMoodGradient"
-                      x1="0"
-                      y1="0"
-                      x2="0"
-                      y2="1"
-                    >
-                      <stop
-                        offset="5%"
-                        stopColor="var(--sun)"
-                        stopOpacity={0.4}
-                      />
+            {formattedMoodTrend.length === 0 ? (
+              <p className="text-sm text-muted-foreground">
+                No mood data logged yet.
+              </p>
+            ) : (
+              <div className="h-56">
 
-                      <stop
-                        offset="95%"
-                        stopColor="var(--sun)"
-                        stopOpacity={0}
-                      />
-                    </linearGradient>
-                  </defs>
+                <ResponsiveContainer width="100%" height="100%">
+                  <AreaChart
+                    data={formattedMoodTrend}
+                    margin={{ left: -20, right: 10 }}
+                  >
 
-                  <CartesianGrid
-                    strokeDasharray="3 3"
-                    stroke="var(--border)"
-                    vertical={false}
-                  />
+                    <defs>
+                      <linearGradient
+                        id="reportMoodGradient"
+                        x1="0"
+                        y1="0"
+                        x2="0"
+                        y2="1"
+                      >
+                        <stop
+                          offset="5%"
+                          stopColor="var(--sun)"
+                          stopOpacity={0.4}
+                        />
 
-                  <XAxis
-                    dataKey="week"
-                    stroke="var(--muted-foreground)"
-                    fontSize={12}
-                    tickLine={false}
-                    axisLine={false}
-                  />
+                        <stop
+                          offset="95%"
+                          stopColor="var(--sun)"
+                          stopOpacity={0}
+                        />
+                      </linearGradient>
+                    </defs>
 
-                  <YAxis
-                    domain={[0, 5]}
-                    stroke="var(--muted-foreground)"
-                    fontSize={12}
-                    tickLine={false}
-                    axisLine={false}
-                  />
+                    <CartesianGrid
+                      strokeDasharray="3 3"
+                      stroke="var(--border)"
+                      vertical={false}
+                    />
 
-                  <Tooltip contentStyle={chartTooltip} />
+                    <XAxis
+                      dataKey="label"
+                      stroke="var(--muted-foreground)"
+                      fontSize={11}
+                      tickLine={false}
+                      axisLine={false}
+                    />
 
-                  <Area
-                    type="monotone"
-                    dataKey="mood"
-                    stroke="var(--sun)"
-                    strokeWidth={2.5}
-                    fill="url(#reportMoodGradient)"
-                  />
-                </AreaChart>
-              </ResponsiveContainer>
-            </div>
+                    <YAxis
+                      domain={[0, 5]}
+                      stroke="var(--muted-foreground)"
+                      fontSize={12}
+                      tickLine={false}
+                      axisLine={false}
+                    />
+
+                    <Tooltip contentStyle={chartTooltip} />
+
+                    <Area
+                      type="monotone"
+                      dataKey="mood"
+                      stroke="var(--sun)"
+                      strokeWidth={2.5}
+                      fill="url(#reportMoodGradient)"
+                    />
+
+                  </AreaChart>
+                </ResponsiveContainer>
+
+              </div>
+            )}
+
           </CardContent>
         </Card>
 
-        {/* Sleep */}
+        {/* ===================================================
+            SLEEP
+            =================================================== */}
+
         <Card className="lg:col-span-2">
           <CardContent>
+
             <CardTitle className="mb-4">
-              Sleep hours (weekly avg)
+              Sleep hours
             </CardTitle>
 
-            <div className="h-56">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart
-                  data={SLEEP_TREND}
-                  margin={{ left: -20, right: 10 }}
-                >
-                  <CartesianGrid
-                    strokeDasharray="3 3"
-                    stroke="var(--border)"
-                    vertical={false}
-                  />
+            {formattedSleepTrend.length === 0 ? (
+              <p className="text-sm text-muted-foreground">
+                No sleep data logged yet.
+              </p>
+            ) : (
+              <div className="h-56">
 
-                  <XAxis
-                    dataKey="week"
-                    stroke="var(--muted-foreground)"
-                    fontSize={12}
-                    tickLine={false}
-                    axisLine={false}
-                  />
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart
+                    data={formattedSleepTrend}
+                    margin={{ left: -20, right: 10 }}
+                  >
 
-                  <YAxis
-                    domain={[0, 9]}
-                    stroke="var(--muted-foreground)"
-                    fontSize={12}
-                    tickLine={false}
-                    axisLine={false}
-                  />
+                    <CartesianGrid
+                      strokeDasharray="3 3"
+                      stroke="var(--border)"
+                      vertical={false}
+                    />
 
-                  <Tooltip contentStyle={chartTooltip} />
+                    <XAxis
+                      dataKey="label"
+                      stroke="var(--muted-foreground)"
+                      fontSize={11}
+                      tickLine={false}
+                      axisLine={false}
+                    />
 
-                  <Bar
-                    dataKey="hours"
-                    fill="var(--sprout)"
-                    radius={[6, 6, 0, 0]}
-                  />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
+                    <YAxis
+                      domain={[0, 12]}
+                      stroke="var(--muted-foreground)"
+                      fontSize={12}
+                      tickLine={false}
+                      axisLine={false}
+                    />
+
+                    <Tooltip contentStyle={chartTooltip} />
+
+                    <Bar
+                      dataKey="hours"
+                      fill="var(--sprout)"
+                      radius={[6, 6, 0, 0]}
+                    />
+
+                  </BarChart>
+                </ResponsiveContainer>
+
+              </div>
+            )}
+
           </CardContent>
         </Card>
 

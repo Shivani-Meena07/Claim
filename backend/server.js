@@ -9,6 +9,8 @@ const chatbotRoutes = require("./routes/chatbotRoutes");
 const doctorRoutes = require("./routes/doctorRoutes");
 const reportRoutes = require("./routes/reportRoutes");
 const bookingRoutes = require("./routes/bookingRoutes");
+const moodRoutes = require("./routes/moodRoutes");
+const sleepRoutes = require("./routes/sleepRoutes");
 
 const app = express();
 
@@ -21,6 +23,8 @@ app.use("/api/chatbot", chatbotRoutes);
 app.use("/api/doctors", doctorRoutes);
 app.use("/api/reports", reportRoutes);
 app.use("/api/bookings", bookingRoutes);
+app.use("/api/mood", moodRoutes);
+app.use("/api/sleep", sleepRoutes);
 
 connectDB();
 

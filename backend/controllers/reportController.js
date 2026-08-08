@@ -1,11 +1,19 @@
 const { generateMonthlyReport } = require("../services/geminiService");
+
 const Cycle = require("../models/Cycle");
+const Mood = require("../models/Mood");
+const Sleep = require("../models/Sleep");
 
 const getMonthlyReportAI = async (req, res) => {
   try {
-    // Get only the logged-in user's cycles
+    const userId = req.user.id;
+
+    // ===============================
+    // GET USER'S CYCLE DATA
+    // ===============================
+
     const cycles = await Cycle.find({
-      user: req.user.id,
+      user: userId,
     })
       .sort({ startDate: -1 })
       .limit(6);
@@ -17,9 +25,29 @@ const getMonthlyReportAI = async (req, res) => {
       });
     }
 
-    // -----------------------------
-    // Cycle lengths
-    // -----------------------------
+    // ===============================
+    // GET USER'S MOOD DATA
+    // ===============================
+
+    const moods = await Mood.find({
+      user: userId,
+    })
+      .sort({ date: -1 })
+      .limit(30);
+
+    // ===============================
+    // GET USER'S SLEEP DATA
+    // ===============================
+
+    const sleep = await Sleep.find({
+      user: userId,
+    })
+      .sort({ date: -1 })
+      .limit(30);
+
+    // ===============================
+    // CYCLE LENGTHS
+    // ===============================
 
     const cycleLengths = cycles
       .filter(
@@ -35,9 +63,9 @@ const getMonthlyReportAI = async (req, res) => {
       }))
       .reverse();
 
-    // -----------------------------
-    // Symptom frequency
-    // -----------------------------
+    // ===============================
+    // SYMPTOM FREQUENCY
+    // ===============================
 
     const symptomCounts = {};
 
@@ -57,9 +85,9 @@ const getMonthlyReportAI = async (req, res) => {
       }))
       .sort((a, b) => b.count - a.count);
 
-    // -----------------------------
-    // Flow distribution
-    // -----------------------------
+    // ===============================
+    // FLOW DISTRIBUTION
+    // ===============================
 
     const flowCounts = {};
 
@@ -77,19 +105,40 @@ const getMonthlyReportAI = async (req, res) => {
       })
     );
 
-    // -----------------------------
-    // Report data
-    // -----------------------------
+    // ===============================
+    // MOOD TREND
+    // ===============================
+
+    const moodTrend = moods
+      .map((entry) => ({
+        date: new Date(entry.date).toISOString().split("T")[0],
+        mood: entry.mood,
+        note: entry.note || "",
+      }))
+      .reverse();
+
+    // ===============================
+    // SLEEP TREND
+    // ===============================
+
+    const sleepTrend = sleep
+      .map((entry) => ({
+        date: new Date(entry.date).toISOString().split("T")[0],
+        hours: entry.hours,
+        quality: entry.quality,
+      }))
+      .reverse();
+
+    // ===============================
+    // REPORT DATA
+    // ===============================
 
     const reportData = {
       cycleLengths,
       symptomFrequency,
       flowSplit,
-
-      // Mood and sleep are not currently
-      // stored in the Cycle model.
-      moodTrend: [],
-      sleepTrend: [],
+      moodTrend,
+      sleepTrend,
     };
 
     console.log(
@@ -97,9 +146,9 @@ const getMonthlyReportAI = async (req, res) => {
       JSON.stringify(reportData, null, 2)
     );
 
-    // -----------------------------
-    // Generate AI summary
-    // -----------------------------
+    // ===============================
+    // GENERATE AI SUMMARY
+    // ===============================
 
     const summary = await generateMonthlyReport(reportData);
 
@@ -111,17 +160,10 @@ const getMonthlyReportAI = async (req, res) => {
   } catch (error) {
     console.error("Monthly report AI error:", error);
 
-    if (error.status === 429) {
-  return res.status(429).json({
-    success: false,
-    message: "AI service quota exceeded. Please try again later.",
-  });
-}
-
-res.status(500).json({
-  success: false,
-  message: "Failed to generate monthly report",
-});
+    res.status(500).json({
+      success: false,
+      message: "Failed to generate monthly report",
+    });
   }
 };
 
